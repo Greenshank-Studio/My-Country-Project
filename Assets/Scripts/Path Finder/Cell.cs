@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Cell
@@ -12,6 +10,9 @@ public class Cell
     public float Distance { get; private set; }
     public float DistanceLeft { get; set; }
 
+    public Building BuildingOnCell { get; set; }
+
+    private CellType _type;
     public CellType Type
     {
         get
@@ -19,9 +20,9 @@ public class Cell
             if (!BuildingsGrid.IsPositionExist(Position))
                 return CellType.OutOfRange;
 
-            return BuildingsGrid.Grid[Position.x, Position.y];
+            return _type;
         }
-        private set { BuildingsGrid.Grid[Position.x, Position.y] = value; }
+        set { _type = value; }
     }
 
     public Cell(Vector2Int position)
@@ -68,12 +69,11 @@ public class Cell
 
     public bool IsFreeToMove()
     {
-        if (!BuildingsGrid.IsPositionExist(Position)) return false;
+        if (!BuildingsGrid.IsPositionExist(Position)) 
+            return false;
 
-        return Type switch
+        return BuildingsGrid.Grid[Position.x, Position.y].Type switch
         {
-            CellType.Building => false,
-            CellType.Road => false,
             CellType.Grass => true,
             _ => false
         };
@@ -84,7 +84,7 @@ public class Cell
         return new Cell(new Vector2Int(Position.x + biasX, Position.y + biasY));
     }
 
-    public override bool Equals(System.Object obj)
+    public override bool Equals(object obj)
     {
         if (obj == null || !GetType().Equals(obj.GetType()))
         {

@@ -22,7 +22,7 @@ public abstract class Building : MonoBehaviour
         }
     }
 
-    public void SetDisplacementColor(bool availableToBuild)
+    public virtual void SetDisplacementColor(bool availableToBuild)
     {
         if (availableToBuild)
         {
@@ -44,23 +44,13 @@ public abstract class Building : MonoBehaviour
         }
     }
 
-    public virtual void Flip()
-    {
-        buildingModelTransform.localScale = new Vector3(
-                buildingModelTransform.localScale.x,
-                buildingModelTransform.localScale.y * -1,
-                buildingModelTransform.localScale.z);
-
-        buildingModelTransform.Rotate(Vector3.forward, 180f);
-    }
-
     protected void PlaceBuildingOnGrid(int posX, int posY, CellType type)
     {
         for (int x = 0; x < Size.x; x++)
         {
             for (int y = 0; y < Size.y; y++)
             {
-                BuildingsGrid.Grid[posX + x, posY + y] = type;
+                BuildingsGrid.Grid[posX + x, posY + y].Type = type;
             }
         }
     }

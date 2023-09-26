@@ -1,86 +1,22 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class BuildingsGrid : MonoBehaviour
 {
-    public static Building BuildingPrefab;
-    public static Building FlyingBuilding;
-    public static CellType[,] Grid;
+    public static Cell[,] Grid;
     public static Vector2Int GridSize = new (11, 11);
-
-    private Camera _mainCamera;
 
     private void Awake()
     {
-        Grid = new CellType[GridSize.x, GridSize.y];
-
-        _mainCamera = Camera.main;
-    }
-
-    private void Update()
-    {
-        if(FlyingBuilding != null)
+        Grid = new Cell[GridSize.x, GridSize.y];
+        for (int i = 0; i < Grid.GetLength(0); i++)
         {
-            StartPlacingBuildingProcess();
-        }
-    }
-
-    private void StartPlacingBuildingProcess()
-    {
-        Plane groundPlane = new(Vector3.up, Vector3.zero);
-
-        Ray ray = _mainCamera.ScreenPointToRay(Input.mousePosition);
-
-        if (groundPlane.Raycast(ray, out float enterPosition))
-        {
-            Vector3 worldPosition = ray.GetPoint(enterPosition);
-
-            int mousePosX = Mathf.RoundToInt(worldPosition.x);
-            int mousePosY = Mathf.RoundToInt(worldPosition.z);
-
-            bool isAvailableToBuild = IsBuildingCanBePlaced(mousePosX, mousePosY);
-
-            FlyingBuilding.transform.position = new Vector3(mousePosX, 0f, mousePosY);
-            FlyingBuilding.SetDisplacementColor(isAvailableToBuild);
-
-            if(Input.GetKeyDown(KeyCode.R)) FlyingBuilding.Flip();
-
-            FlyingBuilding.PlaceBuilding(isAvailableToBuild, mousePosX, mousePosY);
-        }
-    }
-
-    public void InstantiateNewFlyingBuilding(Building buildingPrefab)
-    {
-        if (FlyingBuilding != null) 
-            Destroy(FlyingBuilding.gameObject);
-
-        BuildingPrefab = buildingPrefab;
-        FlyingBuilding = Instantiate(buildingPrefab);
-    }
-
-    private bool IsBuildingCanBePlaced(int x, int y)
-    {
-        if (IsOutOfBounds(x, y) || IsPlaceTaken(x, y)) return false;
-        return true;
-    }
-
-    private bool IsOutOfBounds(int x, int y)
-    {
-        if (x < 0 || x > GridSize.x - FlyingBuilding.Size.x
-        || y < 0 || y > GridSize.y - FlyingBuilding.Size.y) return true;
-        return false;
-    }
-
-    private bool IsPlaceTaken(int placeX, int placeY)
-    {
-        for (int x = 0; x < FlyingBuilding.Size.x; x++)
-        {
-            for (int y = 0; y < FlyingBuilding.Size.y; y++)
+            for (int j = 0; j < Grid.GetLength(1); j++)
             {
-                if (Grid[placeX + x, placeY + y] != CellType.Grass) return true;
+                Grid[j, i] = new (new(j, i));
+                Grid[j, i].Type = CellType.Grass;
             }
         }
-
-        return false;
     }
 
     public static bool IsPositionExist(Vector2Int position)
@@ -90,5 +26,40 @@ public class BuildingsGrid : MonoBehaviour
             return true;
 
         return false;
+    }
+
+    public static List<Cell> GetAdjacentCellsOfType(int x, int y, CellType type)
+    {
+        List<Cell> adjacentCells = GetAllAdjacentCells(x, y);
+        for (int i = adjacentCells.Count - 1; i >= 0; i--)
+        {
+            if (Grid[adjacentCells[i].Position.x, adjacentCells[i].Position.y].Type != type)
+            {
+                adjacentCells.RemoveAt(i);
+            }
+        }
+        return adjacentCells;
+    }
+
+    internal static List<Cell> GetAllAdjacentCells(int x, int y)
+    {
+        List<Cell> adjacentCells = new List<Cell>();
+        if (x > 0)
+        {
+            adjacentCells.Add(new Cell(new Vector2Int(x - 1, y)));
+        }
+        if (x < GridSize.x - 1)
+        {
+            adjacentCells.Add(new Cell(new Vector2Int(x + 1, y)));
+        }
+        if (y > 0)
+        {
+            adjacentCells.Add(new Cell(new Vector2Int(x, y - 1)));
+        }
+        if (y < GridSize.y - 1)
+        {
+            adjacentCells.Add(new Cell(new Vector2Int(x, y + 1)));
+        }
+        return adjacentCells;
     }
 }
