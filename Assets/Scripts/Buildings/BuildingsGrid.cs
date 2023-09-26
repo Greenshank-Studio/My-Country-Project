@@ -8,15 +8,32 @@ public class BuildingsGrid : MonoBehaviour
 
     private void Awake()
     {
+        InitializeGrid();
+    }
+
+    private void InitializeGrid()
+    {
         Grid = new Cell[GridSize.x, GridSize.y];
         for (int i = 0; i < Grid.GetLength(0); i++)
         {
             for (int j = 0; j < Grid.GetLength(1); j++)
             {
-                Grid[j, i] = new (new(j, i));
+                Grid[j, i] = new(new(j, i));
                 Grid[j, i].Type = CellType.Grass;
             }
         }
+    }
+
+    public static void CheckAllCells()
+    {
+        for (int i = 0; i < Grid.GetLength(0); i++)
+        {
+            for (int j = 0; j < Grid.GetLength(1); j++)
+            {
+                Debug.Log(Grid[j, i].BuildingOnCell);
+            }
+        }
+        
     }
 
     public static bool IsPositionExist(Vector2Int position)

@@ -3,9 +3,9 @@ using UnityEngine;
 
 public abstract class Building : MonoBehaviour
 {
+    [SerializeField] private List<Renderer> MainRenderer;
     public Vector2Int Size = Vector2Int.one;
-    public List<Renderer> MainRenderer;
-
+    
     protected Camera mainCamera;
     protected List<Color> modelColors;
     protected Transform buildingModelTransform;
@@ -22,7 +22,9 @@ public abstract class Building : MonoBehaviour
         }
     }
 
-    public virtual void SetDisplacementColor(bool availableToBuild)
+    public abstract void PlaceBuilding(ref bool isAvailableToBuild, int mousePosX, int mousePosY);
+
+    public void SetDisplacementColor(bool availableToBuild)
     {
         if (availableToBuild)
         {
@@ -45,7 +47,7 @@ public abstract class Building : MonoBehaviour
     }
 
     protected void PlaceBuildingOnGrid(int posX, int posY, CellType type)
-    {
+    {   
         for (int x = 0; x < Size.x; x++)
         {
             for (int y = 0; y < Size.y; y++)
@@ -53,6 +55,21 @@ public abstract class Building : MonoBehaviour
                 BuildingsGrid.Grid[posX + x, posY + y].Type = type;
             }
         }
+    }
+
+    protected void SetBuldingOnCell(Building building)
+    {
+        for (int x = 0; x < Size.x; x++)
+        {
+            for (int y = 0; y < Size.y; y++)
+            {
+                BuildingsGrid.Grid
+                    [(int)building.transform.position.x + x, 
+                    (int)building.transform.position.z + y]
+                    .BuildingOnCell = building;
+            }
+        }
+        
     }
 
     private void OnDrawGizmosSelected()
@@ -66,6 +83,4 @@ public abstract class Building : MonoBehaviour
             }
         }
     }
-
-    public abstract void PlaceBuilding(bool isAvailableToBuild, int mousePosX, int mousePosY);
 }

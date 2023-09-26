@@ -2,13 +2,14 @@ using UnityEngine;
 
 public class BusinessBuilding : Building, IRotatable
 {
-    public override void PlaceBuilding(bool isAvailableToBuild, int mousePosX, int mousePosY)
+    public override void PlaceBuilding(ref bool isAvailableToBuild, int mousePosX, int mousePosY)
     {
         if (isAvailableToBuild)
         {
             if (Input.GetMouseButtonDown(1))
             {
                 PlaceBuildingOnGrid(mousePosX, mousePosY, CellType.Building);
+                SetBuldingOnCell(PlacementManager.FlyingBuilding);
 
                 SetNormalColor();
                 PlacementManager.FlyingBuilding = null;

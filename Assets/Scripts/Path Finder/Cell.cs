@@ -32,22 +32,6 @@ public class Cell
         DistanceLeft = 0;
     }
 
-    public Cell(Vector2Int position, Cell parent, float distance)
-    {
-        Position = position;
-        Parent = parent;
-        Distance = distance;
-        DistanceLeft = 0;
-    }
-
-    public Cell(Vector2Int position, Cell parent, float distance, float distanceLeft)
-    {
-        Position = position;
-        Parent = parent;
-        Distance = distance;
-        DistanceLeft = distanceLeft;
-    }
-
     public Cell SetParent(Cell cell)
     {
         Parent = cell;

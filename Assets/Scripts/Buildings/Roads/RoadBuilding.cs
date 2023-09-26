@@ -14,7 +14,7 @@ public class RoadBuilding : Building
     private Stack<Cell> _way = new ();
     private List<Building> _tempBuildingList = new ();
 
-    public override void PlaceBuilding(bool isAvailableToBuild, int mousePosX, int mousePosY)
+    public override void PlaceBuilding(ref bool isAvailableToBuild, int mousePosX, int mousePosY)
     {
         if (isAvailableToBuild)
         {
@@ -37,7 +37,7 @@ public class RoadBuilding : Building
 
                 Cell target = PathFinder.Search(_startPoint, _currentPoint);
 
-                FillWayStack(target);
+                FillPathWithCells(target);
                  
                 Cell prePreviousCell = _way.Peek();
                 Cell previousCell = prePreviousCell;
@@ -58,7 +58,13 @@ public class RoadBuilding : Building
                             rotationaAngle);
                 }
 
-                PlaceLastRoadInRightAngle(previousCell, currentCell);
+                Building lastFlyingRoad = PlaceLastRoadInRightAngle(previousCell, currentCell);
+
+                if(DoObstaclesInterfereWithThePlacementOfLastRoad(lastFlyingRoad))
+                {
+                    return;
+                }
+                
 
                 //Второе нажатие ЛКМ
                 if (Input.GetMouseButtonDown(1))
@@ -71,13 +77,14 @@ public class RoadBuilding : Building
                     
                     foreach (Building building in _tempBuildingList)
                     {
+                        SetBuldingOnCell(building);
                         building.SetNormalColor();
                     }
-
+                    
                     Destroy(_tempBuildingList[0].gameObject);
                     Destroy(PlacementManager.FlyingBuilding.gameObject);
-
-                    _isBuildingPlacing = !_isBuildingPlacing;
+                    // Доделать сохранение здания/дороги в клетку на сетке!
+                    BuildingsGrid.CheckAllCells();
                 }
             }
         }
@@ -96,7 +103,7 @@ public class RoadBuilding : Building
         }
     }
 
-    private void FillWayStack(Cell target)
+    private void FillPathWithCells(Cell target)
     {
         if (target != null)
         {
@@ -175,20 +182,32 @@ public class RoadBuilding : Building
         return false;
     }
 
-    private void PlaceLastRoadInRightAngle(Cell previousCell, Cell currentCell)
+    private Building PlaceLastRoadInRightAngle(Cell previousCell, Cell currentCell)
     {
         float lastRoadAngle = (currentCell.Position - previousCell.Position).x == 0 ? 0 : 90;
 
         PlacementManager.FlyingBuilding.transform.eulerAngles = new Vector3(0f, lastRoadAngle, 0f);
 
-        InstantiateFlyingBuilding(
+        return InstantiateFlyingBuilding(
                     _straightRoad,
                     currentCell.Position.x,
                     currentCell.Position.y,
                     lastRoadAngle);
     }
 
-    private void InstantiateFlyingBuilding(Building prefab, int posX, int posY, float rotationAngle)
+    private bool DoObstaclesInterfereWithThePlacementOfLastRoad(Building lastFlyingRoad)
+    {
+        if (!PlacementManager.FlyingBuilding.gameObject.transform.position
+                    .Equals(lastFlyingRoad.gameObject.transform.position))
+        {
+            PlacementManager.FlyingBuilding.SetDisplacementColor(false);
+            return true;
+        }
+
+        return false;
+    }
+
+    private Building InstantiateFlyingBuilding(Building prefab, int posX, int posY, float rotationAngle)
     {
         Building building = Instantiate(
                         prefab,
@@ -199,5 +218,7 @@ public class RoadBuilding : Building
         building.SetDisplacementColor(true);
 
         _tempBuildingList.Add(building);
+
+        return building;
     }
 }

@@ -1,5 +1,3 @@
-
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlacementManager : MonoBehaviour
@@ -22,7 +20,7 @@ public class PlacementManager : MonoBehaviour
         }
     }
 
-    public void StartPlacingProcess()
+    private void StartPlacingProcess()
     {
         Plane groundPlane = new(Vector3.up, Vector3.zero);
 
@@ -34,12 +32,12 @@ public class PlacementManager : MonoBehaviour
 
             int mousePosX = Mathf.RoundToInt(worldPosition.x);
             int mousePosY = Mathf.RoundToInt(worldPosition.z);
-
+            
             bool isAvailableToBuild = IsBuildingCanBePlaced(mousePosX, mousePosY);
 
             FlyingBuilding.SetDisplacementColor(isAvailableToBuild);
             FlyingBuilding.transform.position = new Vector3(mousePosX, 0f, mousePosY);
-            FlyingBuilding.PlaceBuilding(isAvailableToBuild, mousePosX, mousePosY);
+            FlyingBuilding.PlaceBuilding(ref isAvailableToBuild, mousePosX, mousePosY);
         }
     }
 
@@ -52,7 +50,7 @@ public class PlacementManager : MonoBehaviour
         FlyingBuilding = Instantiate(buildingPrefab);
     }
 
-    protected bool IsBuildingCanBePlaced(int x, int y)
+    private bool IsBuildingCanBePlaced(int x, int y)
     {
         if (IsOutOfBounds(x, y) || IsPlaceTaken(x, y)) return false;
         return true;
