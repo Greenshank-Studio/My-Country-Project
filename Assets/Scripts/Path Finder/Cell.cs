@@ -10,14 +10,14 @@ public class Cell
     public float Distance { get; private set; }
     public float DistanceLeft { get; set; }
 
-    public Building BuildingOnCell { get; set; }
+    public Structure StructureOnCell { get; set; }
 
     private CellType _type;
     public CellType Type
     {
         get
         {
-            if (!BuildingsGrid.IsPositionExist(Position))
+            if (!Map.IsPositionExist(Position))
                 return CellType.OutOfRange;
 
             return _type;
@@ -53,10 +53,10 @@ public class Cell
 
     public bool IsFreeToMove()
     {
-        if (!BuildingsGrid.IsPositionExist(Position)) 
+        if (!Map.IsPositionExist(Position)) 
             return false;
 
-        return BuildingsGrid.Grid[Position.x, Position.y].Type switch
+        return Map.Grid[Position.x, Position.y].Type switch
         {
             CellType.Grass => true,
             _ => false

@@ -1,37 +1,37 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RoadBuilding : Building
+public class Road : Structure
 {
-    [SerializeField] private RoadBuilding _straightRoad;
-    [SerializeField] private RoadBuilding _turnRoad;
+    [SerializeField] private Road _straightRoad;
+    [SerializeField] private Road _turnRoad;
 
     private Cell _startPoint = new (Vector2Int.one);
     private Cell _currentPoint = new (Vector2Int.one);
 
-    private bool _isBuildingPlacing;
+    private bool _isRoadPlacing;
 
     private Stack<Cell> _way = new ();
-    private List<Building> _tempBuildingList = new ();
+    private List<Structure> _tempRoadList = new ();
 
-    public override void PlaceBuilding(ref bool isAvailableToBuild, int mousePosX, int mousePosY)
+    public override void PlaceStructure(ref bool isAvailableToBuild, int mousePosX, int mousePosY)
     {
         if (isAvailableToBuild)
         {
-            SafeDestroyAndClearBuildingList();
+            SafeDestroyAndClearRoadList();
 
             // Первое нажатие ЛКМ
-            if (!_isBuildingPlacing && Input.GetMouseButtonDown(1))
+            if (!_isRoadPlacing && Input.GetMouseButtonDown(1))
             {
                 _startPoint = new Cell(new Vector2Int(mousePosX, mousePosY));
 
-                _isBuildingPlacing = !_isBuildingPlacing;
+                _isRoadPlacing = !_isRoadPlacing;
 
                 return;
             }
 
             // Процесс построения дороги (между первым и вторым нажатием ЛКМ)
-            if(_isBuildingPlacing)
+            if(_isRoadPlacing)
             {
                 _currentPoint = new Cell(new Vector2Int(mousePosX, mousePosY));
 
@@ -58,7 +58,7 @@ public class RoadBuilding : Building
                             rotationaAngle);
                 }
 
-                Building lastFlyingRoad = PlaceLastRoadInRightAngle(previousCell, currentCell);
+                Structure lastFlyingRoad = PlaceLastRoadInRightAngle(previousCell, currentCell);
 
                 if(DoObstaclesInterfereWithThePlacementOfLastRoad(lastFlyingRoad))
                 {
@@ -72,34 +72,34 @@ public class RoadBuilding : Building
                     
                     foreach (Cell cell in _way)
                     {
-                        PlaceBuildingOnGrid(cell.Position.x, cell.Position.y, CellType.Road);
+                        PlaceStructureOnGrid(cell.Position.x, cell.Position.y, CellType.Road);
                     }
                     
-                    foreach (Building building in _tempBuildingList)
+                    foreach (Structure road in _tempRoadList)
                     {
-                        SetBuldingOnCell(building);
-                        building.SetNormalColor();
+                        SetStructureOnCell(road);
+                        road.SetNormalColor();
                     }
                     
-                    Destroy(_tempBuildingList[0].gameObject);
-                    Destroy(PlacementManager.FlyingBuilding.gameObject);
+                    Destroy(_tempRoadList[0].gameObject);
+                    Destroy(PlacementManager.FlyingStructure.gameObject);
                     // Доделать сохранение здания/дороги в клетку на сетке!
-                    BuildingsGrid.CheckAllCells();
+                    Map.CheckAllCells();
                 }
             }
         }
     }
 
-    private void SafeDestroyAndClearBuildingList()
+    private void SafeDestroyAndClearRoadList()
     {
-        if (_tempBuildingList.Count > 0)
+        if (_tempRoadList.Count > 0)
         {
-            foreach (Building building in _tempBuildingList)
+            foreach (Structure road in _tempRoadList)
             {
-                Destroy(building.gameObject);
+                Destroy(road.gameObject);
             }
 
-            _tempBuildingList.Clear();
+            _tempRoadList.Clear();
         }
     }
 
@@ -182,11 +182,11 @@ public class RoadBuilding : Building
         return false;
     }
 
-    private Building PlaceLastRoadInRightAngle(Cell previousCell, Cell currentCell)
+    private Structure PlaceLastRoadInRightAngle(Cell previousCell, Cell currentCell)
     {
         float lastRoadAngle = (currentCell.Position - previousCell.Position).x == 0 ? 0 : 90;
 
-        PlacementManager.FlyingBuilding.transform.eulerAngles = new Vector3(0f, lastRoadAngle, 0f);
+        PlacementManager.FlyingStructure.transform.eulerAngles = new Vector3(0f, lastRoadAngle, 0f);
 
         return InstantiateFlyingBuilding(
                     _straightRoad,
@@ -195,30 +195,30 @@ public class RoadBuilding : Building
                     lastRoadAngle);
     }
 
-    private bool DoObstaclesInterfereWithThePlacementOfLastRoad(Building lastFlyingRoad)
+    private bool DoObstaclesInterfereWithThePlacementOfLastRoad(Structure lastFlyingRoad)
     {
-        if (!PlacementManager.FlyingBuilding.gameObject.transform.position
+        if (!PlacementManager.FlyingStructure.gameObject.transform.position
                     .Equals(lastFlyingRoad.gameObject.transform.position))
         {
-            PlacementManager.FlyingBuilding.SetDisplacementColor(false);
+            PlacementManager.FlyingStructure.SetDisplacementColor(false);
             return true;
         }
 
         return false;
     }
 
-    private Building InstantiateFlyingBuilding(Building prefab, int posX, int posY, float rotationAngle)
+    private Structure InstantiateFlyingBuilding(Structure prefab, int posX, int posY, float rotationAngle)
     {
-        Building building = Instantiate(
+        Structure road = Instantiate(
                         prefab,
                         new Vector3(posX, 0f, posY),
                         Quaternion.identity);
 
-        building.transform.eulerAngles = new Vector3(0f, rotationAngle, 0f);
-        building.SetDisplacementColor(true);
+        road.transform.eulerAngles = new Vector3(0f, rotationAngle, 0f);
+        road.SetDisplacementColor(true);
 
-        _tempBuildingList.Add(building);
+        _tempRoadList.Add(road);
 
-        return building;
+        return road;
     }
 }

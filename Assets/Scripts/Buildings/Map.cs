@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BuildingsGrid : MonoBehaviour
+public class Map : MonoBehaviour
 {
     public static Cell[,] Grid;
     public static Vector2Int GridSize = new (11, 11);
@@ -30,7 +30,7 @@ public class BuildingsGrid : MonoBehaviour
         {
             for (int j = 0; j < Grid.GetLength(1); j++)
             {
-                Debug.Log(Grid[j, i].BuildingOnCell);
+                Debug.Log(Grid[j, i].Type);
             }
         }
         

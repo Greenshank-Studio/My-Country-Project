@@ -1,86 +1,29 @@
-using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class Building : MonoBehaviour
+public class Building : Structure, IRotatable
 {
-    [SerializeField] private List<Renderer> MainRenderer;
-    public Vector2Int Size = Vector2Int.one;
-    
-    protected Camera mainCamera;
-    protected List<Color> modelColors;
-    protected Transform buildingModelTransform;
-
-    private void Awake()
+    public override void PlaceStructure(ref bool isAvailableToBuild, int mousePosX, int mousePosY)
     {
-        mainCamera = Camera.main;
-        modelColors = new List<Color>();
-        buildingModelTransform = transform.GetChild(0).GetComponent<Transform>();
-
-        foreach(Renderer renderer in MainRenderer)
+        if (isAvailableToBuild)
         {
-            modelColors.Add(renderer.material.color);
-        }
-    }
-
-    public abstract void PlaceBuilding(ref bool isAvailableToBuild, int mousePosX, int mousePosY);
-
-    public void SetDisplacementColor(bool availableToBuild)
-    {
-        if (availableToBuild)
-        {
-            foreach (Renderer renderer in MainRenderer)
-                renderer.material.color = Color.green;
-        }
-        else
-        {
-            foreach (Renderer renderer in MainRenderer)
-                renderer.material.color = Color.red;
-        }
-    }
-
-    public void SetNormalColor()
-    {
-        for (int i = 0; i < MainRenderer.Capacity; i++)
-        {
-            MainRenderer[i].material.color = modelColors[i];
-        }
-    }
-
-    protected void PlaceBuildingOnGrid(int posX, int posY, CellType type)
-    {   
-        for (int x = 0; x < Size.x; x++)
-        {
-            for (int y = 0; y < Size.y; y++)
+            if (Input.GetMouseButtonDown(1))
             {
-                BuildingsGrid.Grid[posX + x, posY + y].Type = type;
+                PlaceStructureOnGrid(mousePosX, mousePosY, CellType.Building);
+                SetStructureOnCell(PlacementManager.FlyingStructure);
+
+                SetNormalColor();
+                PlacementManager.FlyingStructure = null;
             }
         }
     }
 
-    protected void SetBuldingOnCell(Building building)
+    public void Rotate()
     {
-        for (int x = 0; x < Size.x; x++)
-        {
-            for (int y = 0; y < Size.y; y++)
-            {
-                BuildingsGrid.Grid
-                    [(int)building.transform.position.x + x, 
-                    (int)building.transform.position.z + y]
-                    .BuildingOnCell = building;
-            }
-        }
-        
-    }
+        BuildingModelTransform.localScale = new Vector3(
+                BuildingModelTransform.localScale.x,
+                BuildingModelTransform.localScale.y * -1,
+                BuildingModelTransform.localScale.z);
 
-    private void OnDrawGizmosSelected()
-    {
-        for (int y = 0; y < Size.y; y++)
-        {
-            for (int x = 0; x < Size.x; x++)
-            {
-                Gizmos.color = new Color(0f, 1f, 1f, 0.3f);
-                Gizmos.DrawCube(transform.position + new Vector3(x, 0f, y), new Vector3(1f, 0.1f, 1f));
-            }
-        }
+        BuildingModelTransform.Rotate(Vector3.forward, 180f);
     }
 }

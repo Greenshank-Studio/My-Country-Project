@@ -2,8 +2,8 @@ using UnityEngine;
 
 public class PlacementManager : MonoBehaviour
 {
-    public static Building BuildingPrefab;
-    public static Building FlyingBuilding;
+    public static Structure StructurePrefab;
+    public static Structure FlyingStructure;
 
     protected Camera mainCamera;
 
@@ -14,7 +14,7 @@ public class PlacementManager : MonoBehaviour
 
     private void Update()
     {
-        if (FlyingBuilding != null)
+        if (FlyingStructure != null)
         {
             StartPlacingProcess();
         }
@@ -33,24 +33,24 @@ public class PlacementManager : MonoBehaviour
             int mousePosX = Mathf.RoundToInt(worldPosition.x);
             int mousePosY = Mathf.RoundToInt(worldPosition.z);
             
-            bool isAvailableToBuild = IsBuildingCanBePlaced(mousePosX, mousePosY);
+            bool isAvailableToBuild = IsStructureCanBePlaced(mousePosX, mousePosY);
 
-            FlyingBuilding.SetDisplacementColor(isAvailableToBuild);
-            FlyingBuilding.transform.position = new Vector3(mousePosX, 0f, mousePosY);
-            FlyingBuilding.PlaceBuilding(ref isAvailableToBuild, mousePosX, mousePosY);
+            FlyingStructure.SetDisplacementColor(isAvailableToBuild);
+            FlyingStructure.transform.position = new Vector3(mousePosX, 0f, mousePosY);
+            FlyingStructure.PlaceStructure(ref isAvailableToBuild, mousePosX, mousePosY);
         }
     }
 
-    public void InstantiateNewFlyingBuilding(Building buildingPrefab)
+    public void InstantiateNewFlyingStructure(Structure structurePrefab)
     {
-        if (FlyingBuilding != null)
-            Destroy(FlyingBuilding.gameObject);
+        if (FlyingStructure != null)
+            Destroy(FlyingStructure.gameObject);
 
-        BuildingPrefab = buildingPrefab;
-        FlyingBuilding = Instantiate(buildingPrefab);
+        StructurePrefab = structurePrefab;
+        FlyingStructure = Instantiate(structurePrefab);
     }
 
-    private bool IsBuildingCanBePlaced(int x, int y)
+    private bool IsStructureCanBePlaced(int x, int y)
     {
         if (IsOutOfBounds(x, y) || IsPlaceTaken(x, y)) return false;
         return true;
@@ -58,18 +58,18 @@ public class PlacementManager : MonoBehaviour
 
     private bool IsOutOfBounds(int x, int y)
     {
-        if (x < 0 || x > BuildingsGrid.GridSize.x - FlyingBuilding.Size.x
-        || y < 0 || y > BuildingsGrid.GridSize.y - FlyingBuilding.Size.y) return true;
+        if (x < 0 || x > Map.GridSize.x - FlyingStructure.Size.x
+        || y < 0 || y > Map.GridSize.y - FlyingStructure.Size.y) return true;
         return false;
     }
 
     private bool IsPlaceTaken(int placeX, int placeY)
     {
-        for (int x = 0; x < FlyingBuilding.Size.x; x++)
+        for (int x = 0; x < FlyingStructure.Size.x; x++)
         {
-            for (int y = 0; y < FlyingBuilding.Size.y; y++)
+            for (int y = 0; y < FlyingStructure.Size.y; y++)
             {
-                if (BuildingsGrid.Grid[placeX + x, placeY + y].Type != CellType.Grass) return true;
+                if (Map.Grid[placeX + x, placeY + y].Type != CellType.Grass) return true;
             }
         }
 
