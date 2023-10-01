@@ -8,11 +8,11 @@ public class Building : Structure, IRotatable
         {
             if (Input.GetMouseButtonDown(1))
             {
-                PlaceStructureOnGrid(mousePosX, mousePosY, CellType.Building);
-                SetStructureOnCell(PlacementManager.FlyingStructure);
+                PlaceCellOnMap(mousePosX, mousePosY, null, CellType.Building);
+                SetStructureOnMap(StructurePlacement.FlyingStructure);
 
                 SetNormalColor();
-                PlacementManager.FlyingStructure = null;
+                StructurePlacement.FlyingStructure = null;
             }
         }
     }

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Cell
@@ -28,6 +29,14 @@ public class Cell
     public Cell(Vector2Int position)
     {
         Position = position;
+        Distance = 0;
+        DistanceLeft = 0;
+    }
+
+    public Cell(Vector2Int position, Structure cellStructure)
+    {
+        Position = position;
+        StructureOnCell = cellStructure;
         Distance = 0;
         DistanceLeft = 0;
     }
@@ -66,6 +75,27 @@ public class Cell
     public Cell GetNeighbour(int biasX, int biasY)
     {
         return new Cell(new Vector2Int(Position.x + biasX, Position.y + biasY));
+    }
+
+    public List<Cell> GetFourNeighbours()
+    {
+        List<Cell> cells = new(4);
+
+        for(int x = -1; x < 2; x += 2)
+        {
+            if (!(Position.x + x < 0 || Position.x + x > Map.GridSize.x - 1!)) 
+            {
+                cells.Add(Map.Grid[Position.x + x, Position.y]);
+            }
+        }
+        for (int y = -1; y < 2; y += 2)
+        {
+            if (!(Position.y + y < 0 || Position.y + y > Map.GridSize.y - 1))
+            {
+                cells.Add(Map.Grid[Position.x, Position.y + y]);
+            }
+        }
+        return cells;
     }
 
     public override bool Equals(object obj)

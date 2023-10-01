@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Road : Structure
@@ -11,16 +12,17 @@ public class Road : Structure
 
     private bool _isRoadPlacing;
 
-    private Stack<Cell> _way = new ();
+    private Stack<Cell> _path = new ();
     private List<Structure> _tempRoadList = new ();
 
     public override void PlaceStructure(ref bool isAvailableToBuild, int mousePosX, int mousePosY)
     {
         if (isAvailableToBuild)
         {
-            SafeDestroyAndClearRoadList();
+            ClearCellStructuresOnPath();
+            ClearTempRoadList();
 
-            // Первое нажатие ЛКМ
+            // Первое нажатие ПКМ
             if (!_isRoadPlacing && Input.GetMouseButtonDown(1))
             {
                 _startPoint = new Cell(new Vector2Int(mousePosX, mousePosY));
@@ -30,7 +32,7 @@ public class Road : Structure
                 return;
             }
 
-            // Процесс построения дороги (между первым и вторым нажатием ЛКМ)
+            // Процесс построения дороги (между первым и вторым нажатием ПКМ)
             if(_isRoadPlacing)
             {
                 _currentPoint = new Cell(new Vector2Int(mousePosX, mousePosY));
@@ -39,11 +41,27 @@ public class Road : Structure
 
                 FillPathWithCells(target);
                  
-                Cell prePreviousCell = _way.Peek();
+                Cell prePreviousCell = _path.Peek();
                 Cell previousCell = prePreviousCell;
                 Cell currentCell = previousCell;
                 
-                foreach (Cell cell in _way)
+                /*while(_path.Count != 0)
+                {
+                    prePreviousCell = previousCell;
+                    previousCell = currentCell;
+                    currentCell = _path.Pop();
+
+                    bool isRoadTurn = IsRoadTurn(currentCell, previousCell, prePreviousCell, out float rotationaAngle);
+
+                    if (!previousCell.Equals(currentCell))
+                        previousCell.StructureOnCell = InstantiateFlyingRoad(
+                                isRoadTurn ? _turnRoad : _straightRoad,
+                                previousCell.Position.x,
+                                previousCell.Position.y,
+                                rotationaAngle);
+                } */
+                
+                foreach (Cell cell in _path)
                 {
                     prePreviousCell = previousCell;
                     previousCell = currentCell;
@@ -51,7 +69,8 @@ public class Road : Structure
 
                     bool isRoadTurn = IsRoadTurn(currentCell, previousCell, prePreviousCell, out float rotationaAngle);
 
-                    InstantiateFlyingBuilding(
+                    if(!previousCell.Equals(currentCell))
+                    previousCell.StructureOnCell = InstantiateFlyingRoad(
                             isRoadTurn ? _turnRoad : _straightRoad,
                             previousCell.Position.x,
                             previousCell.Position.y,
@@ -60,37 +79,51 @@ public class Road : Structure
 
                 Structure lastFlyingRoad = PlaceLastRoadInRightAngle(previousCell, currentCell);
 
-                if(DoObstaclesInterfereWithThePlacementOfLastRoad(lastFlyingRoad))
+                if (DoObstaclesInterfereWithThePlacementOfRoad(lastFlyingRoad))
                 {
                     return;
                 }
-                
 
-                //Второе нажатие ЛКМ
+                //Второе нажатие ПКМ
                 if (Input.GetMouseButtonDown(1))
                 {
-                    
-                    foreach (Cell cell in _way)
+                    foreach (Cell cell in _path)
                     {
-                        PlaceStructureOnGrid(cell.Position.x, cell.Position.y, CellType.Road);
+                        PlaceCellOnMap(cell.Position.x, cell.Position.y, cell, CellType.Road);
                     }
-                    
+
                     foreach (Structure road in _tempRoadList)
                     {
-                        SetStructureOnCell(road);
+                        SetStructureOnMap(road);
                         road.SetNormalColor();
                     }
+
+                    Destroy(StructurePlacement.FlyingStructure.gameObject);
+
+                    foreach (Cell cell in _path)
+                    {
+                        //Debug.Log(cell.Position + " " + cell.StructureOnCell.transform.position);
+                        RoadFixer.Instance.ModifyRoad(cell);
+                    }
                     
-                    Destroy(_tempRoadList[0].gameObject);
-                    Destroy(PlacementManager.FlyingStructure.gameObject);
-                    // Доделать сохранение здания/дороги в клетку на сетке!
-                    Map.CheckAllCells();
+                    //Map.CheckAllCells();
                 }
             }
         }
     }
 
-    private void SafeDestroyAndClearRoadList()
+    private void ClearCellStructuresOnPath()
+    {
+        if (_path.Count > 0)
+        {
+            foreach (Cell cell in _path)
+            {
+                cell.StructureOnCell = null;
+            }
+        }
+    }
+
+    private void ClearTempRoadList()
     {
         if (_tempRoadList.Count > 0)
         {
@@ -107,14 +140,14 @@ public class Road : Structure
     {
         if (target != null)
         {
-            _way.Clear();
+            _path.Clear();
             
             while (target.Parent != null)
             {
-                _way.Push(target);
+                _path.Push(target);
                 target = target.Parent;
             }
-            _way.Push(_startPoint);
+            _path.Push(_startPoint);
         }
     }
 
@@ -186,28 +219,16 @@ public class Road : Structure
     {
         float lastRoadAngle = (currentCell.Position - previousCell.Position).x == 0 ? 0 : 90;
 
-        PlacementManager.FlyingStructure.transform.eulerAngles = new Vector3(0f, lastRoadAngle, 0f);
+        StructurePlacement.FlyingStructure.transform.eulerAngles = new Vector3(0f, lastRoadAngle, 0f);
 
-        return InstantiateFlyingBuilding(
+        return InstantiateFlyingRoad(
                     _straightRoad,
                     currentCell.Position.x,
                     currentCell.Position.y,
-                    lastRoadAngle);
+                    lastRoadAngle); ;
     }
 
-    private bool DoObstaclesInterfereWithThePlacementOfLastRoad(Structure lastFlyingRoad)
-    {
-        if (!PlacementManager.FlyingStructure.gameObject.transform.position
-                    .Equals(lastFlyingRoad.gameObject.transform.position))
-        {
-            PlacementManager.FlyingStructure.SetDisplacementColor(false);
-            return true;
-        }
-
-        return false;
-    }
-
-    private Structure InstantiateFlyingBuilding(Structure prefab, int posX, int posY, float rotationAngle)
+    private Structure InstantiateFlyingRoad(Structure prefab, int posX, int posY, float rotationAngle)
     {
         Structure road = Instantiate(
                         prefab,
@@ -220,5 +241,17 @@ public class Road : Structure
         _tempRoadList.Add(road);
 
         return road;
+    }
+
+    private bool DoObstaclesInterfereWithThePlacementOfRoad(Structure lastFlyingRoad)
+    {
+        if (!StructurePlacement.FlyingStructure.gameObject.transform.position
+                    .Equals(lastFlyingRoad.gameObject.transform.position))
+        {
+            StructurePlacement.FlyingStructure.SetDisplacementColor(false);
+            return true;
+        }
+
+        return false;
     }
 }

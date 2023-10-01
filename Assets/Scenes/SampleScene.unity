@@ -3026,7 +3026,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 578772004}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fc166d0431586d1499e640f19190cbba, type: 3}
+  m_Script: {fileID: 11500000, guid: 6ea3be104e7dcf44c962a5ccb53860d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!4 &583908608 stripped
@@ -3352,12 +3352,12 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 914753389}
         m_TargetAssemblyTypeName: PlacementManager, Assembly-CSharp
-        m_MethodName: InstantiateNewFlyingBuilding
+        m_MethodName: InstantiateNewFlyingStructure
         m_Mode: 2
         m_Arguments:
           m_ObjectArgument: {fileID: 2874888412410126797, guid: f8e4b3e4698b38344b8da43090a770ab,
             type: 3}
-          m_ObjectArgumentAssemblyTypeName: Building, Assembly-CSharp
+          m_ObjectArgumentAssemblyTypeName: Structure, Assembly-CSharp
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -7087,12 +7087,12 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 914753389}
         m_TargetAssemblyTypeName: PlacementManager, Assembly-CSharp
-        m_MethodName: InstantiateNewFlyingBuilding
+        m_MethodName: InstantiateNewFlyingStructure
         m_Mode: 2
         m_Arguments:
           m_ObjectArgument: {fileID: 3268070542771614130, guid: 27918757d03532c4da2d94937de32f32,
             type: 3}
-          m_ObjectArgumentAssemblyTypeName: Building, Assembly-CSharp
+          m_ObjectArgumentAssemblyTypeName: Structure, Assembly-CSharp
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -7232,14 +7232,14 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 578772007}
-        m_TargetAssemblyTypeName: BuildingsGrid, Assembly-CSharp
-        m_MethodName: InstantiateNewFlyingBuilding
+      - m_Target: {fileID: 914753389}
+        m_TargetAssemblyTypeName: PlacementManager, Assembly-CSharp
+        m_MethodName: InstantiateNewFlyingStructure
         m_Mode: 2
         m_Arguments:
           m_ObjectArgument: {fileID: 3648490359827002738, guid: e43e070813b2aaa439d191300d51ef37,
             type: 3}
-          m_ObjectArgumentAssemblyTypeName: Building, Assembly-CSharp
+          m_ObjectArgumentAssemblyTypeName: Structure, Assembly-CSharp
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -10817,6 +10817,57 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1480646668}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1970966903
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1970966905}
+  - component: {fileID: 1970966904}
+  m_Layer: 0
+  m_Name: RoadFixer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1970966904
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1970966903}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bd18af38d0ffff74992700dbe22b8c58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  deadEnd: {fileID: 6774330260988960863, guid: d68df035aa2b19146982e4456015a392, type: 3}
+  roadStraight: {fileID: 3268070542771614130, guid: 6c48dc06c34013f4fb065e38a331edbf,
+    type: 3}
+  corner: {fileID: 6774330260988960863, guid: 386a24362deeaab46807d228134f390e, type: 3}
+  threeWay: {fileID: 6774330260988960863, guid: 5bd5ad53879dcd6449189d5548e6c158,
+    type: 3}
+  fourWay: {fileID: 6774330260988960863, guid: e3ff140c627b8fe4ea5ff40acda3014c, type: 3}
+--- !u!4 &1970966905
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1970966903}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 11.163473, y: -7.2923512, z: 11.378057}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 7
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1971033276 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2498562717059128549, guid: 0b859a1169726c3479d32b6976d72d25,

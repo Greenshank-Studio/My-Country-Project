@@ -1,117 +1,198 @@
-/*using UnityEngine;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
 public class RoadFixer : MonoBehaviour
 {
-    public GameObject deadEnd, roadStraight, corner, threeWay, fourWay;
+    public static RoadFixer Instance { private set; get; }
 
-    public void FixRoadAtPosition(PlacementManager placementManager, Vector3Int temporaryPosition)
+    public Road deadEnd, roadStraight, corner, threeWay, fourWay;
+
+    private int recursionStep;
+
+    private void Awake()
     {
-        //[right, up, left, down]
-        var result = placementManager.GetNeighbourTypesFor(temporaryPosition);
-        int roadCount = 0;
-        roadCount = result.Where(x => x == CellType.Road).Count();
-        if (roadCount == 0 || roadCount == 1)
+        if(!Instance)
         {
-            CreateDeadEnd(placementManager, result, temporaryPosition);
-        }
-        else if (roadCount == 2)
-        {
-            if (CreateStraightRoad(placementManager, result, temporaryPosition))
-                return;
-            CreateCorner(placementManager, result, temporaryPosition);
-        }
-        else if (roadCount == 3)
-        {
-            Create3Way(placementManager, result, temporaryPosition);
+            Instance = this;
         }
         else
         {
-            Create4Way(placementManager, result, temporaryPosition);
+            Destroy(Instance);
         }
+
+        recursionStep = 0;
     }
 
-    private void Create4Way(PlacementManager placementManager, CellType[] result, Vector3Int temporaryPosition)
+    public void ModifyRoad(Cell cell)
     {
-        placementManager.ModifyStructureModel(temporaryPosition, fourWay, Quaternion.identity);
+        List<Cell> neigbours = cell.GetFourNeighbours();
+        var roadNeigbours = neigbours.Where(n => n.Type.Equals(CellType.Road));
+        int roadCount = roadNeigbours.Count();
+        
+        switch (roadCount)
+        {
+            case 0:
+                FixRoadModel(cell, deadEnd, roadNeigbours);
+                break;
+            case 1:
+                FixRoadModel(cell, deadEnd, roadNeigbours);
+                break;
+            case 2:
+                int xDiff = roadNeigbours.ToArray()[0].Position.x - roadNeigbours.ToArray()[1].Position.x;
+                int yDiff = roadNeigbours.ToArray()[0].Position.y - roadNeigbours.ToArray()[1].Position.y;
+
+                if (xDiff == 0 || yDiff == 0)
+                {
+                    FixRoadModel(cell, roadStraight, roadNeigbours);
+                }
+                else
+                {
+                    FixRoadModel(cell, corner, roadNeigbours);
+                }
+                break;
+            case 3:
+                FixRoadModel(cell, threeWay, roadNeigbours);
+                break;
+            case 4:
+                FixRoadModel(cell, fourWay, roadNeigbours);
+                break;
+            default:
+                FixRoadModel(cell, deadEnd, roadNeigbours);
+                break;
+        }
+
+        /*if(recursionStep < 2)
+        {
+            foreach(Cell c in roadNeigbours.ToList())
+            {
+                ModifyRoad(c);
+            }
+
+            recursionStep++;
+        }*/
     }
 
-    //[left, up, right, down]
-    private void Create3Way(PlacementManager placementManager, CellType[] result, Vector3Int temporaryPosition)
+    private void FixRoadModel(Cell cell, Road road, IEnumerable<Cell> neigbours)
     {
-        if (result[1] == CellType.Road && result[2] == CellType.Road && result[3] == CellType.Road)
-        {
-            placementManager.ModifyStructureModel(temporaryPosition, threeWay, Quaternion.identity);
-        }
-        else if (result[2] == CellType.Road && result[3] == CellType.Road && result[0] == CellType.Road)
-        {
-            placementManager.ModifyStructureModel(temporaryPosition, threeWay, Quaternion.Euler(0, 90, 0));
-        }
-        else if (result[3] == CellType.Road && result[0] == CellType.Road && result[1] == CellType.Road)
-        {
-            placementManager.ModifyStructureModel(temporaryPosition, threeWay, Quaternion.Euler(0, 180, 0));
-        }
-        else if (result[0] == CellType.Road && result[1] == CellType.Road && result[2] == CellType.Road)
-        {
-            placementManager.ModifyStructureModel(temporaryPosition, threeWay, Quaternion.Euler(0, 270, 0));
-        }
+        Quaternion quaternion = SetRightRotation(cell, neigbours);
 
+        Structure structure = Instantiate(
+                    road,
+                    new Vector3(cell.Position.x, 0f, cell.Position.y),
+                    quaternion);
+
+        Map.DestroyCell(cell.StructureOnCell);
+
+        cell.StructureOnCell = structure;
+        cell.Type = CellType.Road;
+
+        Map.Grid[cell.Position.x, cell.Position.y] = cell;
     }
 
-    //[left, up, right, down]
-    private void CreateCorner(PlacementManager placementManager, CellType[] result, Vector3Int temporaryPosition)
+    private Quaternion SetRightRotation(Cell cell, IEnumerable<Cell> neigbours)
     {
-        if (result[1] == CellType.Road && result[2] == CellType.Road)
+        Quaternion quaternion;
+        int count = neigbours.Count();
+        
+        switch (count)
         {
-            placementManager.ModifyStructureModel(temporaryPosition, corner, Quaternion.Euler(0, 90, 0));
+            case 0:
+            case 1:
+                quaternion = SetRotationForDeadEnd(cell, neigbours);
+                break;
+            case 2:
+                quaternion = SetRotationForStraightOrCorner(cell, neigbours);
+                break;
+            case 3:
+                quaternion = SetRotationForThreeWay(cell);
+                break;
+            default:
+                quaternion = Quaternion.Euler(0f, 0f, 0f);
+                break;
         }
-        else if (result[2] == CellType.Road && result[3] == CellType.Road)
-        {
-            placementManager.ModifyStructureModel(temporaryPosition, corner, Quaternion.Euler(0, 180, 0));
-        }
-        else if (result[3] == CellType.Road && result[0] == CellType.Road)
-        {
-            placementManager.ModifyStructureModel(temporaryPosition, corner, Quaternion.Euler(0, 270, 0));
-        }
-        else if (result[0] == CellType.Road && result[1] == CellType.Road)
-        {
-            placementManager.ModifyStructureModel(temporaryPosition, corner, Quaternion.identity);
-        }
+        return quaternion;
     }
 
-    //[left, up, right, down]
-    private bool CreateStraightRoad(PlacementManager placementManager, CellType[] result, Vector3Int temporaryPosition)
+    private Quaternion SetRotationForDeadEnd(Cell cell, IEnumerable<Cell> neighbours)
     {
-        if (result[0] == CellType.Road && result[2] == CellType.Road)
+        List<Cell> cells = neighbours.ToList();
+
+        if(cells.Count > 0)
         {
-            placementManager.ModifyStructureModel(temporaryPosition, roadStraight, Quaternion.identity);
-            return true;
+            Vector2Int difference = cell.Position - cells[0].Position;
+
+            if(difference.x > 0) return Quaternion.Euler(0f, 90f, 0f);
+            else if(difference.x < 0) return Quaternion.Euler(0f, -90f, 0f);
+            else if (difference.y < 0) return Quaternion.Euler(0f, 180f, 0f);
+            else if (difference.y > 0) return Quaternion.Euler(0f, 0f, 0f);
         }
-        else if (result[1] == CellType.Road && result[3] == CellType.Road)
-        {
-            placementManager.ModifyStructureModel(temporaryPosition, roadStraight, Quaternion.Euler(0, 90, 0));
-            return true;
-        }
-        return false;
+
+        return Quaternion.Euler(0f, 0f, 0f);
     }
 
-    //[left, up, right, down]
-    private void CreateDeadEnd(PlacementManager placementManager, CellType[] result, Vector3Int temporaryPosition)
+    private Quaternion SetRotationForStraightOrCorner(Cell cell, IEnumerable<Cell> neighbours)
     {
-        if (result[1] == CellType.Road)
+        List<Cell> cells = neighbours.ToList();
+
+        Vector2Int previousDifference = cell.Position - cells[0].Position;
+        Vector2Int currentDifference = cells[1].Position - cell.Position;
+        
+        // straight
+        if (currentDifference.y == 0 && previousDifference.y == 0)
         {
-            placementManager.ModifyStructureModel(temporaryPosition, deadEnd, Quaternion.Euler(0, 270, 0));
+            return Quaternion.Euler(0f, 90f, 0f);
         }
-        else if (result[2] == CellType.Road)
+        if (currentDifference.x == 0 && previousDifference.x == 0)
         {
-            placementManager.ModifyStructureModel(temporaryPosition, deadEnd, Quaternion.identity);
+            return Quaternion.Euler(0f, 0f, 0f);
         }
-        else if (result[3] == CellType.Road)
+        
+        // corner
+        if (currentDifference.y == 1 && previousDifference.x == 1
+            || currentDifference.x == -1 && previousDifference.y == -1)
         {
-            placementManager.ModifyStructureModel(temporaryPosition, deadEnd, Quaternion.Euler(0, 90, 0));
+            return Quaternion.Euler(0f, -90f, 0f);
         }
-        else if (result[0] == CellType.Road)
+        else if (currentDifference.x == 1 && previousDifference.y == 1
+            || currentDifference.y == -1 && previousDifference.x == -1)
         {
-            placementManager.ModifyStructureModel(temporaryPosition, deadEnd, Quaternion.Euler(0, 180, 0));
+            return Quaternion.Euler(0f, 90f, 0f);
         }
+        else if (currentDifference.y == -1 && previousDifference.x == 1
+            || currentDifference.x == -1 && previousDifference.y == 1)
+        {
+            return Quaternion.Euler(0f, 180f, 0f);
+        }
+        else if (currentDifference.y == 1 && previousDifference.x == -1
+            || currentDifference.x == 1 && previousDifference.y == -1)
+        {
+            return Quaternion.Euler(0f, 0f, 0f);
+        }
+
+        return Quaternion.Euler(0f, 0f, 0f);
     }
-}*/
+
+    private Quaternion SetRotationForThreeWay(Cell cell)
+    {
+        List<Cell> cells = cell.GetFourNeighbours();
+        Cell grassCell = cell;
+
+        foreach(Cell c in cells)
+        {
+            if(c.Type != CellType.Road)
+            {
+                grassCell = c;
+            }
+        }
+
+        Vector2Int difference = cell.Position - grassCell.Position;
+        
+        if (difference.x > 0) return Quaternion.Euler(0f, 180f, 0f);
+        else if (difference.x < 0) return Quaternion.Euler(0f, 0f, 0f);
+        else if (difference.y > 0) return Quaternion.Euler(0f, 90f, 0f);
+        else if (difference.y < 0) return Quaternion.Euler(0f, -90f, 0f);
+
+        return Quaternion.Euler(0f, 0f, 0f);
+    }
+}

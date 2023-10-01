@@ -4,11 +4,12 @@ using UnityEngine;
 public abstract class Structure : MonoBehaviour
 {
     [SerializeField] private List<Renderer> MainRenderer;
+
     public Vector2Int Size = Vector2Int.one;
     
-    protected Camera MainCamera;
-    protected List<Color> ModelColors;
-    protected Transform BuildingModelTransform;
+    protected Camera MainCamera { private set; get; }
+    protected List<Color> ModelColors { private set; get; }
+    protected Transform BuildingModelTransform { private set; get; }
 
     private void Awake()
     {
@@ -46,18 +47,26 @@ public abstract class Structure : MonoBehaviour
         }
     }
 
-    protected void PlaceStructureOnGrid(int posX, int posY, CellType type)
+    protected void PlaceCellOnMap(int posX, int posY, Cell cell, CellType type)
     {   
         for (int x = 0; x < Size.x; x++)
         {
             for (int y = 0; y < Size.y; y++)
             {
-                Map.Grid[posX + x, posY + y].Type = type;
+                if (cell != null)
+                {
+                    cell.Type = type;
+                    Map.Grid[posX + x, posY + y] = cell;
+                }
+                else
+                {
+                    Map.Grid[posX + x, posY + y].Type = type;
+                }
             }
         }
     }
 
-    protected void SetStructureOnCell(Structure structure)
+    protected void SetStructureOnMap(Structure structure)
     {
         for (int x = 0; x < Size.x; x++)
         {

@@ -30,11 +30,18 @@ public class Map : MonoBehaviour
         {
             for (int j = 0; j < Grid.GetLength(1); j++)
             {
-                Debug.Log(Grid[j, i].Type);
+                Debug.Log(Grid[j, i].StructureOnCell);
             }
         }
-        
     }
+
+    public static void DestroyCell(Structure structure)
+    {
+        Destroy(Grid[
+            (int)structure.gameObject.transform.position.x,
+            (int)structure.gameObject.transform.position.z]
+                    .StructureOnCell.gameObject);
+    } 
 
     public static bool IsPositionExist(Vector2Int position)
     {

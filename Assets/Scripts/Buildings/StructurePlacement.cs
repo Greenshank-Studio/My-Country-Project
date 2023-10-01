@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class PlacementManager : MonoBehaviour
+public class StructurePlacement : MonoBehaviour
 {
     public static Structure StructurePrefab;
     public static Structure FlyingStructure;
@@ -18,6 +18,15 @@ public class PlacementManager : MonoBehaviour
         {
             StartPlacingProcess();
         }
+    }
+
+    public void InstantiateNewFlyingStructure(Structure structurePrefab)
+    {
+        if (FlyingStructure != null)
+            Destroy(FlyingStructure.gameObject);
+
+        StructurePrefab = structurePrefab;
+        FlyingStructure = Instantiate(structurePrefab);
     }
 
     private void StartPlacingProcess()
@@ -39,15 +48,6 @@ public class PlacementManager : MonoBehaviour
             FlyingStructure.transform.position = new Vector3(mousePosX, 0f, mousePosY);
             FlyingStructure.PlaceStructure(ref isAvailableToBuild, mousePosX, mousePosY);
         }
-    }
-
-    public void InstantiateNewFlyingStructure(Structure structurePrefab)
-    {
-        if (FlyingStructure != null)
-            Destroy(FlyingStructure.gameObject);
-
-        StructurePrefab = structurePrefab;
-        FlyingStructure = Instantiate(structurePrefab);
     }
 
     private bool IsStructureCanBePlaced(int x, int y)
@@ -74,5 +74,10 @@ public class PlacementManager : MonoBehaviour
         }
 
         return false;
+    }
+
+    public void ModifyStructureModel(Vector3Int position, GameObject newModel, Quaternion rotation)
+    {
+
     }
 }
