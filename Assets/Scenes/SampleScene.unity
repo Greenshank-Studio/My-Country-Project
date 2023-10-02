@@ -3355,7 +3355,7 @@ MonoBehaviour:
         m_MethodName: InstantiateNewFlyingStructure
         m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 2874888412410126797, guid: f8e4b3e4698b38344b8da43090a770ab,
+          m_ObjectArgument: {fileID: 2874888412410126797, guid: 4e7372b5c098dcb4f9c1f1780da19bcf,
             type: 3}
           m_ObjectArgumentAssemblyTypeName: Structure, Assembly-CSharp
           m_IntArgument: 0

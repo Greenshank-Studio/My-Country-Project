@@ -176,17 +176,18 @@ public class RoadFixer : MonoBehaviour
     private Quaternion SetRotationForThreeWay(Cell cell)
     {
         List<Cell> cells = cell.GetFourNeighbours();
-        Cell grassCell = cell;
+        Cell notRoadCell = cell;
 
         foreach(Cell c in cells)
         {
+            Debug.Log(c.Type);
             if(c.Type != CellType.Road)
             {
-                grassCell = c;
+                notRoadCell = c;
             }
         }
 
-        Vector2Int difference = cell.Position - grassCell.Position;
+        Vector2Int difference = cell.Position - notRoadCell.Position;
         
         if (difference.x > 0) return Quaternion.Euler(0f, 180f, 0f);
         else if (difference.x < 0) return Quaternion.Euler(0f, 0f, 0f);
