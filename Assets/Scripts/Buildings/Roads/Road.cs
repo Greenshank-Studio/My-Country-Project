@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public class Road : Structure
@@ -45,22 +44,6 @@ public class Road : Structure
                 Cell previousCell = prePreviousCell;
                 Cell currentCell = previousCell;
                 
-                /*while(_path.Count != 0)
-                {
-                    prePreviousCell = previousCell;
-                    previousCell = currentCell;
-                    currentCell = _path.Pop();
-
-                    bool isRoadTurn = IsRoadTurn(currentCell, previousCell, prePreviousCell, out float rotationaAngle);
-
-                    if (!previousCell.Equals(currentCell))
-                        previousCell.StructureOnCell = InstantiateFlyingRoad(
-                                isRoadTurn ? _turnRoad : _straightRoad,
-                                previousCell.Position.x,
-                                previousCell.Position.y,
-                                rotationaAngle);
-                } */
-                
                 foreach (Cell cell in _path)
                 {
                     prePreviousCell = previousCell;
@@ -70,13 +53,16 @@ public class Road : Structure
                     bool isRoadTurn = IsRoadTurn(currentCell, previousCell, prePreviousCell, out float rotationaAngle);
 
                     if(!previousCell.Equals(currentCell))
-                    previousCell.StructureOnCell = InstantiateFlyingRoad(
+                    {
+                        previousCell.StructureOnCell = InstantiateFlyingRoad(
                             isRoadTurn ? _turnRoad : _straightRoad,
                             previousCell.Position.x,
                             previousCell.Position.y,
                             rotationaAngle);
+                    }
                 }
 
+                // «десь строитс€ последн€€ дорога (до этого мы строили каждую предыдущую дорогу)
                 Structure lastFlyingRoad = PlaceLastRoadInRightAngle(previousCell, currentCell);
 
                 if (DoObstaclesInterfereWithThePlacementOfRoad(lastFlyingRoad))
@@ -102,11 +88,8 @@ public class Road : Structure
 
                     foreach (Cell cell in _path)
                     {
-                        //Debug.Log(cell.Position + " " + cell.StructureOnCell.transform.position);
                         RoadFixer.Instance.ModifyRoad(cell);
                     }
-                    
-                    //Map.CheckAllCells();
                 }
             }
         }
@@ -147,6 +130,7 @@ public class Road : Structure
                 _path.Push(target);
                 target = target.Parent;
             }
+
             _path.Push(_startPoint);
         }
     }

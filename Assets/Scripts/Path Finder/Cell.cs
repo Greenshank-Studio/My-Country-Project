@@ -4,7 +4,6 @@ using UnityEngine;
 public class Cell
 {
     public Cell Parent { get; private set; }
-    public Cell Child { get; set; }
 
     public Vector2Int Position { get; }
 
@@ -67,6 +66,7 @@ public class Cell
 
         return Map.Grid[Position.x, Position.y].Type switch
         {
+            CellType.Road => true,
             CellType.Grass => true,
             _ => false
         };

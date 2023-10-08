@@ -8,7 +8,7 @@ public class RoadFixer : MonoBehaviour
 
     public Road deadEnd, roadStraight, corner, threeWay, fourWay;
 
-    private int recursionStep;
+    //private bool _isCheckingRoadNeigbours;
 
     private void Awake()
     {
@@ -20,13 +20,12 @@ public class RoadFixer : MonoBehaviour
         {
             Destroy(Instance);
         }
-
-        recursionStep = 0;
     }
 
     public void ModifyRoad(Cell cell)
     {
         List<Cell> neigbours = cell.GetFourNeighbours();
+
         var roadNeigbours = neigbours.Where(n => n.Type.Equals(CellType.Road));
         int roadCount = roadNeigbours.Count();
         
@@ -62,14 +61,15 @@ public class RoadFixer : MonoBehaviour
                 break;
         }
 
-        /*if(recursionStep < 2)
+        /*if(!_isCheckingRoadNeigbours)
         {
-            foreach(Cell c in roadNeigbours.ToList())
-            {
-                ModifyRoad(c);
-            }
+            _isCheckingRoadNeigbours = !_isCheckingRoadNeigbours;
 
-            recursionStep++;
+            foreach (Cell neigbourCell in roadNeigbours.ToArray())
+            {
+                Debug.Log("cel!!!!");
+                ModifyRoad(neigbourCell);
+            }
         }*/
     }
 
@@ -124,8 +124,8 @@ public class RoadFixer : MonoBehaviour
 
             if(difference.x > 0) return Quaternion.Euler(0f, 90f, 0f);
             else if(difference.x < 0) return Quaternion.Euler(0f, -90f, 0f);
-            else if (difference.y < 0) return Quaternion.Euler(0f, 180f, 0f);
-            else if (difference.y > 0) return Quaternion.Euler(0f, 0f, 0f);
+            else if(difference.y < 0) return Quaternion.Euler(0f, 180f, 0f);
+            else if(difference.y > 0) return Quaternion.Euler(0f, 0f, 0f);
         }
 
         return Quaternion.Euler(0f, 0f, 0f);
@@ -180,7 +180,6 @@ public class RoadFixer : MonoBehaviour
 
         foreach(Cell c in cells)
         {
-            Debug.Log(c.Type);
             if(c.Type != CellType.Road)
             {
                 notRoadCell = c;
