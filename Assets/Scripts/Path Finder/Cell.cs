@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Cell
+public class Cell // each cube
 {
     public Cell Parent { get; private set; }
 

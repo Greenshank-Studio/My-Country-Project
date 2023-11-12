@@ -6,12 +6,13 @@ public class Map : MonoBehaviour
     [SerializeField] private Camera _mainCamera;
 
     public static Cell[,] Grid;
-    public static Vector2Int GridSize = new (11, 11);
+    public static Vector2Int GridSize = new (55, 55); // change grid size (work across all game)
 
     private bool _isCellDeleting;
 
     private void Awake()
     {
+        // Application.targetFrameRate = 1; // set frame rate to 30 fps
         InitializeGrid();
     }
 
@@ -46,7 +47,7 @@ public class Map : MonoBehaviour
             }
         }
     }
-    // TODO сдюкхрэ мютх ц щрнр лернд нрячдю!!11!!!
+    // TODO О©╫О©╫О©╫О©╫О©╫О©╫О©╫ О©╫О©╫О©╫О©╫ О©╫ О©╫О©╫О©╫О©╫ О©╫О©╫О©╫О©╫О©╫ О©╫О©╫О©╫О©╫О©╫О©╫!!11!!!
     public void DeleteCell()
     {
         _isCellDeleting = !_isCellDeleting;

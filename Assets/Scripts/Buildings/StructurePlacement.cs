@@ -7,6 +7,16 @@ public class StructurePlacement : MonoBehaviour
 
     protected Camera mainCamera;
 
+    public GameObject SelectBuildingMenu;
+
+    public void OpenSelectBuildingMenu(){
+        Debug.Log("HELLOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
+        SelectBuildingMenu.SetActive(true);
+        if (SelectBuildingMenu != null){
+            SelectBuildingMenu.SetActive(true);
+        }
+    }
+
     private void Awake()
     {
         mainCamera = Camera.main;

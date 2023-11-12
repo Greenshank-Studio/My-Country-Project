@@ -16,24 +16,56 @@ public class CameraMovement : MonoBehaviour
 
     private Vector3 _newPosition;
 
+    private bool _is_camera_moving;
+
+    [UnityEditor.Callbacks.DidReloadScripts]
+    private static void OnScriptsReloaded()
+    {
+    Debug.Log("Applying high CPU load workaround");
+    UnityEditor.EditorApplication.update += () => {
+        System.Threading.Thread.Sleep(10);
+    };
+    }
+
     private void Awake()
     {
-        _normalSpeed = 0.1f;
-        _fastSpeed = 0.3f;
+        _normalSpeed = 10.1f;
+        _fastSpeed = 20.9f;
         _movementSpeed = _normalSpeed;
         _movementTime = 3f;
-        _zoomAmount = 0.5f;
+        _zoomAmount = 0.5f; // zoom speed
+        _is_camera_moving = true;
 
         _rigTransform = GetComponent<Transform>();
-        _cameraComponent = _rigTransform.GetChild(0).GetComponent<Camera>();
+        _cameraComponent = Camera.main; // _rigTransform.GetChild(0).GetComponent<Camera>();
+
+        Debug.Log(Camera.main == null);
 
         _newPosition = _rigTransform.position;
     }
 
-    private void LateUpdate()
+    private void Start(){
+        Application.targetFrameRate = 60; // set frame rate to 30 fps
+    }
+
+    private void OnEnable(){ // whan current object is enabled (set active == true)
+        Menu.onMenuOpen += StopCameraMovement;
+    }
+
+    private void OnDisable(){
+        Menu.onMenuOpen -= StopCameraMovement;
+    }
+
+    private void StopCameraMovement(bool is_camera_moving){
+        _is_camera_moving = is_camera_moving;
+    }
+
+    private void LateUpdate() // build-in method
     {
-        HandleAllKeyboardInput();
-        HandleAllMouseInput();
+        if (_is_camera_moving){
+            HandleAllKeyboardInput();
+            HandleAllMouseInput();
+        }
     }
 
     private void HandleAllKeyboardInput()
@@ -42,7 +74,7 @@ public class CameraMovement : MonoBehaviour
         HandleMovementInput();
     }
 
-    private void HandleMovementInput()
+    private void HandleMovementInput() 
     {
         if(Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
         {
@@ -61,6 +93,10 @@ public class CameraMovement : MonoBehaviour
             _newPosition += _rigTransform.right * -_movementSpeed;
         }
 
+        if (_newPosition.x > 55) _newPosition.x = 55;
+        if (_newPosition.x < -5) _newPosition.x = -5;
+        if (_newPosition.z > 55) _newPosition.z = 55;
+        if (_newPosition.z < -5) _newPosition.z = -5;
         _rigTransform.position = Vector3.Lerp(_rigTransform.position, _newPosition, Time.deltaTime * _movementTime);
     }
 
@@ -93,6 +129,7 @@ public class CameraMovement : MonoBehaviour
             {
                 _dragStartPosition = ray.GetPoint(enter);
             }
+            
         }
         if (Input.GetMouseButton(0))
         {
@@ -106,15 +143,16 @@ public class CameraMovement : MonoBehaviour
                 _newPosition = _rigTransform.position + _dragStartPosition - _dragCurrentPosition;
             }
         }
+        
     }
 
     private void HandleMouseZoomInput()
     {
-        if (Input.mouseScrollDelta.y > 0 && _cameraComponent.orthographicSize > 1.5)
+        if (Input.mouseScrollDelta.y > 0 && _cameraComponent.orthographicSize > 3)
         {
             _cameraComponent.orthographicSize -= Input.mouseScrollDelta.y * _zoomAmount;
         }
-        if (Input.mouseScrollDelta.y < 0 && _cameraComponent.orthographicSize < 15)
+        if (Input.mouseScrollDelta.y < 0 && _cameraComponent.orthographicSize < 9)
         {
             _cameraComponent.orthographicSize -= Input.mouseScrollDelta.y * _zoomAmount;
         }
