@@ -1,51 +1,64 @@
-﻿using SVS;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    public RoadManager roadManager;
-    public InputManager inputManager;
+    [SerializeField] private RoadPlacement _roadManager;
+    [SerializeField] private InputManager _inputManager;
+    [SerializeField] private UIController _uiController;
+    [SerializeField] private BuildingPlacement _structureManager;
+    [SerializeField] private StructureDeleting _structureDeleting;
 
-    public UIController uiController;
-
-    public StructureManager structureManager;
-
-    private void Start()
+    private void OnEnable()
     {
-        uiController.OnRoadPlacement += RoadPlacementHandler;
-        uiController.OnHousePlacement += HousePlacementHandler;
-        uiController.OnSpecialPlacement += SpecialPlacementHandler;
+        _uiController.OnRoadPlacement += RoadPlacementHandler;
+        _uiController.OnHousePlacement += HousePlacementHandler;
+        _uiController.OnStructureDelete += DeleteStructureHandler;
+    }
+
+    private void OnDisable()
+    {
+        _uiController.OnRoadPlacement -= RoadPlacementHandler;
+        _uiController.OnHousePlacement -= HousePlacementHandler;
+        _uiController.OnStructureDelete -= DeleteStructureHandler;
+    }
+
+    // при нажатии на кнопку House вызывается эта функция, куда передается индекс здания
+    private void HousePlacementHandler(int houseIndex)
+    {
+        ClearInputActions();
+        _structureManager.SetBuildingIndex(houseIndex);
+        _structureManager.InstantiateFlyingBuilding();
+        _inputManager.OnMouseHover += _structureManager.SetFlyingStructure;
+        _inputManager.OnMouseDown += _structureManager.PlaceHouse;
+    }
+
+    private void RoadPlacementHandler(int roadIndex)
+    {
+        ClearInputActions();
+
+        _roadManager.SetBuildingIndex(roadIndex);
+        _roadManager.InstantiateFlyingBuilding();
+        _inputManager.OnMouseHover += _roadManager.SetFlyingStructure;
+        _inputManager.OnMouseDown += _roadManager.PlaceRoad;
+        _inputManager.OnMouseHold += _roadManager.PlaceRoad;
+        _inputManager.OnMouseUp += _roadManager.FinishPlacingRoad;
+    }
+
+    private void DeleteStructureHandler()
+    {
+        ClearInputActions();
         
-    }
-
-    private void SpecialPlacementHandler()
-    {
-        ClearInputActions();
-        inputManager.OnMouseClick += structureManager.PlaceSpecial;
-    }
-
-    private void HousePlacementHandler()
-    {
-        ClearInputActions();
-        inputManager.OnMouseClick += structureManager.PlaceHouse;
-    }
-
-    private void RoadPlacementHandler()
-    {
-        ClearInputActions();
-
-        inputManager.OnMouseClick += roadManager.PlaceRoad;
-        inputManager.OnMouseHold += roadManager.PlaceRoad;
-        inputManager.OnMouseUp += roadManager.FinishPlacingRoad;
+        _inputManager.OnMouseDown += _structureDeleting.DeleteStructure;
     }
 
     private void ClearInputActions()
     {
-        inputManager.OnMouseClick = null;
-        inputManager.OnMouseHold = null;
-        inputManager.OnMouseUp = null;
+        _structureManager.DestroyFlyingBuilding();
+        _roadManager.DestroyFlyingBuilding();
+
+        _inputManager.OnMouseDown = null;
+        _inputManager.OnMouseHold = null;
+        _inputManager.OnMouseUp = null;
+        _inputManager.OnMouseHover = null;
     }
 }

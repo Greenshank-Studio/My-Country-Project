@@ -1,89 +1,86 @@
-﻿using SVS;
-using System;
-using System.Collections;
-using System.Linq;
 using UnityEngine;
 
-public class StructureManager : MonoBehaviour
+public abstract class StructureManager : MonoBehaviour
 {
-    [SerializeField] private StructurePrefabWeighted[] housesPrefabs, specialPrefabs;
-    [SerializeField] private PlacementManager placementManager;
+    [SerializeField] protected PlacementManager placementManager;
+    
+    protected int _buildingIndex;
+    protected GameObject _flyingBuilding;
+    protected MeshRenderer _flyingBuildingRenderer;
 
-    private float[] houseWeights, specialWeights;
-
-    private void Start()
+    private bool _isStructureFlying;
+    
+    private void Awake()
     {
-        houseWeights = housesPrefabs.Select(prefabStats => prefabStats.weight).ToArray();
-        specialWeights = specialPrefabs.Select(prefabStats => prefabStats.weight).ToArray();
+        _buildingIndex = -1;
     }
 
-    public void PlaceHouse(Vector3Int position)
+    public void SetBuildingIndex(int index)
+    {
+        _buildingIndex = index;
+    }
+
+    public void SetFlyingStructure(Vector3Int position)
+    {
+        if (_isStructureFlying)
+        {
+            _flyingBuilding.transform.position = position;
+            SetDisplacementColor(position);
+        }
+    }
+
+    private void SetDisplacementColor(Vector3Int position)
     {
         if (CheckPositionBeforePlacement(position))
         {
-            int randomIndex = GetRandomWeightedIndex(houseWeights);
-            placementManager.PlaceObjectOnTheMap(position, housesPrefabs[randomIndex].prefab, CellType.Structure);
-            AudioPlayer.instance.PlayPlacementSound();
+            _flyingBuildingRenderer.material.color = Color.green;
+        }
+        else
+        {
+            _flyingBuildingRenderer.material.color = Color.red;
         }
     }
 
-    public void PlaceSpecial(Vector3Int position)
+    public virtual void InstantiateFlyingBuilding()
     {
-        if (CheckPositionBeforePlacement(position))
+        if (_flyingBuilding != null)
         {
-            int randomIndex = GetRandomWeightedIndex(specialWeights);
-            placementManager.PlaceObjectOnTheMap(position, specialPrefabs[randomIndex].prefab, CellType.Structure);
-            AudioPlayer.instance.PlayPlacementSound();
+            Destroy(_flyingBuilding.gameObject);
+        }
+
+        //_flyingBuilding = Instantiate(_structurePrefabs[_buildingIndex].Prefab);
+        _flyingBuildingRenderer = _flyingBuilding.transform.GetChild(0).GetComponent<MeshRenderer>();
+        IsStructureFlying(true);
+    }
+
+    public void DestroyFlyingBuilding()
+    {
+        if (_flyingBuilding != null)
+        {
+            Destroy(_flyingBuilding.gameObject);
+            IsStructureFlying(false);
         }
     }
 
-    private int GetRandomWeightedIndex(float[] weights)
+    public void IsStructureFlying(bool isFlying)
     {
-        float sum = 0f;
-        for (int i = 0; i < weights.Length; i++)
-        {
-            sum += weights[i];
-        }
-
-        float randomValue = UnityEngine.Random.Range(0, sum);
-        float tempSum = 0;
-        for (int i = 0; i < weights.Length; i++)
-        {
-            //0->weihg[0] weight[0]->weight[1]
-            if(randomValue >= tempSum && randomValue < tempSum + weights[i])
-            {
-                return i;
-            }
-            tempSum += weights[i];
-        }
-        return 0;
+        _isStructureFlying = isFlying;
     }
 
-    private bool CheckPositionBeforePlacement(Vector3Int position)
+    protected virtual bool CheckPositionBeforePlacement(Vector3Int position)
     {
-        if (placementManager.CheckIfPositionInBound(position) == false)
+        Vector2Int size = new Vector2Int(1, 1);
+
+        if (placementManager.CheckIfPositionInBound(position, size) == false)
         {
             Debug.Log("This position is out of bounds");
             return false;
         }
-        if (placementManager.CheckIfPositionIsFree(position) == false)
+        if (placementManager.CheckIfPositionIsFree(position, size) == false)
         {
             Debug.Log("This position is not EMPTY");
             return false;
         }
-        if(placementManager.GetNeighboursOfTypeFor(position,CellType.Road).Count <= 0)
-        {
-            Debug.Log("Must be placed near a road");
-            return false;
-        }
         return true;
     }
-}
-
-[Serializable]
-public struct StructurePrefabWeighted
-{
-    public GameObject prefab;
-    [Range(0,1)]
-    public float weight;
 }

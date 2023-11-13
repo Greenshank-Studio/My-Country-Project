@@ -1,31 +1,23 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
 public class InputManager : MonoBehaviour
 {
-    public Action<Vector3Int> OnMouseClick, OnMouseHold;
+    public Action<Vector3Int> OnMouseDown, OnMouseHold, OnMouseHover;
     public Action OnMouseUp;
-	private Vector2 cameraMovementVector;
 
 	[SerializeField]
 	Camera mainCamera;
 
 	public LayerMask groundMask;
 
-	public Vector2 CameraMovementVector
-	{
-		get { return cameraMovementVector; }
-	}
-
 	private void Update()
 	{
 		CheckClickDownEvent();
 		CheckClickUpEvent();
 		CheckClickHoldEvent();
-		CheckArrowInput();
+		CheckMouseHoverEvent();
 	}
 
 	private Vector3Int? RaycastGround()
@@ -34,15 +26,9 @@ public class InputManager : MonoBehaviour
 		if(Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, groundMask))
 		{
 			Vector3Int positionInt = Vector3Int.RoundToInt(hit.point);
-			Debug.Log(positionInt);
 			return positionInt;
 		}
 		return null;
-	}
-
-	private void CheckArrowInput()
-	{
-		cameraMovementVector = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
 	}
 
 	private void CheckClickHoldEvent()
@@ -51,8 +37,9 @@ public class InputManager : MonoBehaviour
 		{
 			var position = RaycastGround();
 			if (position != null)
+            {
 				OnMouseHold?.Invoke(position.Value);
-
+			}
 		}
 	}
 
@@ -61,7 +48,6 @@ public class InputManager : MonoBehaviour
 		if (Input.GetMouseButtonUp(1) && EventSystem.current.IsPointerOverGameObject() == false)
 		{
 			OnMouseUp?.Invoke();
-
 		}
 	}
 
@@ -71,8 +57,26 @@ public class InputManager : MonoBehaviour
 		{
 			var position = RaycastGround();
 			if (position != null)
-				OnMouseClick?.Invoke(position.Value);
-
+            {
+				OnMouseDown?.Invoke(position.Value);
+			}
 		}
 	}
+
+	private void CheckMouseHoverEvent()
+    {
+		/*var position = RaycastGround();
+		if (position != null)
+		{
+			OnMouseHover?.Invoke(position.Value);
+		}*/
+		if (EventSystem.current.IsPointerOverGameObject() == false)
+        {
+			var position = RaycastGround();
+			if (position != null)
+			{
+				OnMouseHover?.Invoke(position.Value);
+			}
+		}
+    }
 }

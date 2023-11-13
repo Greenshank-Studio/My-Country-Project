@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class PlacementManager : MonoBehaviour
@@ -11,7 +9,7 @@ public class PlacementManager : MonoBehaviour
     private Dictionary<Vector3Int, StructureModel> temporaryRoadobjects = new Dictionary<Vector3Int, StructureModel>();
     private Dictionary<Vector3Int, StructureModel> structureDictionary = new Dictionary<Vector3Int, StructureModel>();
 
-    private void Start()
+    private void Awake()
     {
         placementGrid = new Grid(width, height);
     }
@@ -21,18 +19,32 @@ public class PlacementManager : MonoBehaviour
         return placementGrid.GetAllAdjacentCellTypes(position.x, position.z);
     }
 
-    internal bool CheckIfPositionInBound(Vector3Int position)
+    internal bool CheckIfPositionInBound(Vector3Int position, Vector2Int size)
     {
-        if(position.x >= 0 && position.x < width && position.z >=0 && position.z < height)
+        for (int i = 0; i < size.x; i++)
         {
-            return true;
+            for (int j = 0; j < size.y; j++)
+            {
+                if (!(position.x + j >= 0 && position.x + j < width && position.z + i >= 0 && position.z + i < height))
+                {
+                    return false;
+                }
+            }
         }
-        return false;
+        
+        return true;
     }
 
-    internal void PlaceObjectOnTheMap(Vector3Int position, GameObject structurePrefab, CellType type)
+    internal void PlaceObjectOnTheMap(Vector3Int position, Vector2Int size, GameObject structurePrefab, CellType type)
     {
-        placementGrid[position.x, position.z] = type;
+        for(int i = 0; i < size.x; i++)
+        {
+            for (int j = 0; j < size.y; j++)
+            {
+                placementGrid[position.x + i, position.z + j] = type;
+            }
+        }
+        
         StructureModel structure = CreateANewStructureModel(position, structurePrefab, type);
         structureDictionary.Add(position, structure);
         DestroyNatureAt(position);
@@ -47,14 +59,24 @@ public class PlacementManager : MonoBehaviour
         }
     }
 
-    internal bool CheckIfPositionIsFree(Vector3Int position)
+    internal bool CheckIfPositionIsFree(Vector3Int position, Vector2Int size)
     {
-        return CheckIfPositionIsOfType(position, CellType.Empty);
+        return CheckIfPositionIsOfType(position, size, CellType.Empty);
     }
 
-    private bool CheckIfPositionIsOfType(Vector3Int position, CellType type)
+    private bool CheckIfPositionIsOfType(Vector3Int position, Vector2Int size, CellType type)
     {
-        return placementGrid[position.x, position.z] == type;
+        for(int i = 0; i < size.x; i++)
+        {
+            for(int j = 0; j < size.y; j++)
+            {
+                if(placementGrid[position.x + j, position.z + i] != type)
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     internal void PlaceTemporaryStructure(Vector3Int position, GameObject structurePrefab, CellType type)

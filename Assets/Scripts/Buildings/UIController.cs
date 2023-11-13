@@ -1,41 +1,41 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class UIController : MonoBehaviour
 {
-    public Action OnRoadPlacement, OnHousePlacement, OnSpecialPlacement;
-    public Button placeRoadButton, placeHouseButton, placeSpecialButton;
+    public Action<int> OnRoadPlacement, OnHousePlacement;
+    public Action OnStructureDelete;
+    public Button PlaceRoadButton, PlaceHouseButton, DeleteButton;
 
     public Color outlineColor;
     List<Button> buttonList;
 
+    private void Awake()
+    {
+        buttonList = new List<Button> { PlaceHouseButton, PlaceRoadButton, DeleteButton };
+    }
+
     private void Start()
     {
-        buttonList = new List<Button> { placeHouseButton, placeRoadButton, placeSpecialButton };
-
-        placeRoadButton.onClick.AddListener(() =>
+        PlaceRoadButton.onClick.AddListener(() =>
         {
             ResetButtonColor();
-            ModifyOutline(placeRoadButton);
-            OnRoadPlacement?.Invoke();
-
+            ModifyOutline(PlaceRoadButton);
+            OnRoadPlacement?.Invoke(0);
         });
-        placeHouseButton.onClick.AddListener(() =>
+        PlaceHouseButton.onClick.AddListener(() =>
         {
             ResetButtonColor();
-            ModifyOutline(placeHouseButton);
-            OnHousePlacement?.Invoke();
-
+            ModifyOutline(PlaceHouseButton);
+            OnHousePlacement?.Invoke(0);
         });
-        placeSpecialButton.onClick.AddListener(() =>
+        DeleteButton.onClick.AddListener(() =>
         {
             ResetButtonColor();
-            ModifyOutline(placeSpecialButton);
-            OnSpecialPlacement?.Invoke();
-
+            ModifyOutline(DeleteButton);
+            OnStructureDelete?.Invoke();
         });
     }
 

@@ -1,13 +1,8 @@
-﻿using SVS;
-using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class RoadManager : MonoBehaviour
+public class RoadPlacement : StructureManager
 {
-    public PlacementManager placementManager;
-
     public List<Vector3Int> temporaryPlacementPositions = new List<Vector3Int>();
     public List<Vector3Int> roadPositionsToRecheck = new List<Vector3Int>();
 
@@ -15,17 +10,51 @@ public class RoadManager : MonoBehaviour
     private bool placementMode = false;
 
     public RoadFixer roadFixer;
+    private Vector2Int _roadSize;
 
-    private void Start()
+    private void Awake()
     {
         roadFixer = GetComponent<RoadFixer>();
+        _roadSize = new Vector2Int(1, 1);
+    }
+
+    public override void InstantiateFlyingBuilding()
+    {
+        if (_flyingBuilding != null)
+        {
+            Destroy(_flyingBuilding.gameObject);
+        }
+
+        _flyingBuilding = Instantiate(roadFixer.deadEnd);
+        _flyingBuildingRenderer = _flyingBuilding.transform.GetChild(0).GetComponent<MeshRenderer>();
+        IsStructureFlying(true);
+    }
+
+    protected override bool CheckPositionBeforePlacement(Vector3Int position)
+    {
+        Vector2Int size = _roadSize;
+
+        if (placementManager.CheckIfPositionInBound(position, size) == false)
+        {
+            return false;
+        }
+        if (placementManager.CheckIfPositionIsFree(position, size) == false)
+        {
+            return false;
+        }
+        return true;
     }
 
     public void PlaceRoad(Vector3Int position)
     {
-        if (placementManager.CheckIfPositionInBound(position) == false)
+        if(_flyingBuilding != null)
+        {
+            DestroyFlyingBuilding();
+        }
+
+        if (placementManager.CheckIfPositionInBound(position, _roadSize) == false)
             return;
-        if (placementManager.CheckIfPositionIsFree(position) == false)
+        if (placementManager.CheckIfPositionIsFree(position, _roadSize) == false)
             return;
         if (placementMode == false)
         {
@@ -55,7 +84,7 @@ public class RoadManager : MonoBehaviour
 
             foreach (var temporaryPosition in temporaryPlacementPositions)
             {
-                if (placementManager.CheckIfPositionIsFree(temporaryPosition) == false)
+                if (placementManager.CheckIfPositionIsFree(temporaryPosition, _roadSize) == false)
                 {
                     roadPositionsToRecheck.Add(temporaryPosition);
                     continue;
@@ -98,5 +127,7 @@ public class RoadManager : MonoBehaviour
         }*/
         temporaryPlacementPositions.Clear();
         startPosition = Vector3Int.zero;
+
+        InstantiateFlyingBuilding();
     }
 }
