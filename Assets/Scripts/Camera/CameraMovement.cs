@@ -16,8 +16,12 @@ public class CameraMovement : MonoBehaviour
 
     private Vector3 _newPosition;
 
+<<<<<<< Updated upstream
     private bool _is_camera_moving;
 
+=======
+    // the following part of the code decreases CPU utilization in Unity editor
+>>>>>>> Stashed changes
     [UnityEditor.Callbacks.DidReloadScripts]
     private static void OnScriptsReloaded()
     {
@@ -93,10 +97,19 @@ public class CameraMovement : MonoBehaviour
             _newPosition += _rigTransform.right * -_movementSpeed;
         }
 
+<<<<<<< Updated upstream
+=======
+        // constrains of map movement
+>>>>>>> Stashed changes
         if (_newPosition.x > 55) _newPosition.x = 55;
         if (_newPosition.x < -5) _newPosition.x = -5;
         if (_newPosition.z > 55) _newPosition.z = 55;
         if (_newPosition.z < -5) _newPosition.z = -5;
+<<<<<<< Updated upstream
+=======
+
+
+>>>>>>> Stashed changes
         _rigTransform.position = Vector3.Lerp(_rigTransform.position, _newPosition, Time.deltaTime * _movementTime);
     }
 

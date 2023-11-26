@@ -19,8 +19,8 @@ public class GameData
     public GameData()
     {
         Money = 1000;
-
-        GridSize = new Vector2Int(11, 11);
+        
+        GridSize = new Vector2Int(55, 55);
         Grid = new CellType[GridSize.x, GridSize.y];
 
         CameraPosition = new Vector3(1.7f, 36f, -63.5f);
