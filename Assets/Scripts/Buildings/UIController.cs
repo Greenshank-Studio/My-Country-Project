@@ -6,11 +6,15 @@ using UnityEngine.UI;
 public class UIController : MonoBehaviour
 {
     public Action<int> OnRoadPlacement, OnHousePlacement;
+    public static Action<bool> OnMenuStateChanged;
     public Action OnStructureDelete;
+
     public Button PlaceRoadButton, PlaceHouseButton, DeleteButton;
 
     public Color outlineColor;
     List<Button> buttonList;
+
+    [SerializeField] private GameObject _chooseBuildingMenu;
 
     private void Awake()
     {
@@ -25,12 +29,22 @@ public class UIController : MonoBehaviour
             ModifyOutline(PlaceRoadButton);
             OnRoadPlacement?.Invoke(0);
         });
+
+
+
         PlaceHouseButton.onClick.AddListener(() =>
         {
-            ResetButtonColor();
-            ModifyOutline(PlaceHouseButton);
+            // ResetButtonColor();
+            // ModifyOutline(PlaceHouseButton);
+            // print(OnHousePlacement == null);
+            // print("google");
             OnHousePlacement?.Invoke(0);
+            // print(OnHousePlacement == null);
+            // print("yandex");
         });
+
+
+
         DeleteButton.onClick.AddListener(() =>
         {
             ResetButtonColor();
@@ -38,6 +52,14 @@ public class UIController : MonoBehaviour
             OnStructureDelete?.Invoke();
         });
     }
+
+
+    public void OpenShop()
+    {
+        _chooseBuildingMenu.SetActive(true);
+        OnMenuStateChanged?.Invoke(true); // here we run all methods we've been subscribed
+    }
+
 
     private void ModifyOutline(Button button)
     {

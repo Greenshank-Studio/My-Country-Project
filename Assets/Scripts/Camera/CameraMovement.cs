@@ -16,6 +16,19 @@ public class CameraMovement : MonoBehaviour
 
     private Vector3 _newPosition;
 
+    private bool _isMenuOpened;
+
+   private void OnEnable() 
+    {
+       UIController.OnMenuStateChanged += ChangeCameraMovementState;
+    }
+
+    private void OnDisable() 
+    {
+        UIController.OnMenuStateChanged -= ChangeCameraMovementState;
+    }
+
+    
     private void Awake()
     {
         _normalSpeed = 0.1f;
@@ -32,8 +45,11 @@ public class CameraMovement : MonoBehaviour
 
     private void LateUpdate()
     {
-        HandleAllKeyboardInput();
-        HandleAllMouseInput();
+        if(!_isMenuOpened)
+        {
+            HandleAllKeyboardInput();
+            HandleAllMouseInput();
+        }
     }
 
     private void HandleAllKeyboardInput()
@@ -119,4 +135,12 @@ public class CameraMovement : MonoBehaviour
             _cameraComponent.orthographicSize -= Input.mouseScrollDelta.y * _zoomAmount;
         }
     }
+
+    private void ChangeCameraMovementState(bool isMenuOpened)
+    {
+        _isMenuOpened = isMenuOpened;
+    }
+
+
 }
+

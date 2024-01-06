@@ -2,21 +2,26 @@
 
 public class GameManager : MonoBehaviour
 {
-    [SerializeField] private RoadPlacement _roadManager;
+    [SerializeField] private RoadPlacement _roadManager; // add word "System" to all hidden system objects
     [SerializeField] private InputManager _inputManager;
     [SerializeField] private UIController _uiController;
     [SerializeField] private BuildingPlacement _structureManager;
     [SerializeField] private StructureDeleting _structureDeleting;
+    [SerializeField] private CameraMovement _cameraMovement;
+    
+    [SerializeField] private GameObject _chooseBuildingMenu;
 
-    private void OnEnable()
+    private void OnEnable() // this method activates when object is enabled
     {
-        _uiController.OnRoadPlacement += RoadPlacementHandler;
+        print("DANYA IS THE BEST");
+        _uiController.OnRoadPlacement += RoadPlacementHandler; // subscribe to the method
         _uiController.OnHousePlacement += HousePlacementHandler;
         _uiController.OnStructureDelete += DeleteStructureHandler;
     }
 
-    private void OnDisable()
+    private void OnDisable() // this method activates when object is disabled
     {
+        print("ANDREY IS THE BEST");
         _uiController.OnRoadPlacement -= RoadPlacementHandler;
         _uiController.OnHousePlacement -= HousePlacementHandler;
         _uiController.OnStructureDelete -= DeleteStructureHandler;
@@ -25,11 +30,13 @@ public class GameManager : MonoBehaviour
     // при нажатии на кнопку House вызывается эта функция, куда передается индекс здания
     private void HousePlacementHandler(int houseIndex)
     {
-        ClearInputActions();
-        _structureManager.SetBuildingIndex(houseIndex);
-        _structureManager.InstantiateFlyingBuilding();
-        _inputManager.OnMouseHover += _structureManager.SetFlyingStructure;
-        _inputManager.OnMouseDown += _structureManager.PlaceHouse;
+
+        // print(houseIndex);
+        // ClearInputActions();
+        // _structureManager.SetBuildingIndex(houseIndex);
+        // _structureManager.InstantiateFlyingBuilding();
+        // _inputManager.OnMouseHover += _structureManager.SetFlyingStructure;
+        // _inputManager.OnMouseDown += _structureManager.PlaceHouse;
     }
 
     private void RoadPlacementHandler(int roadIndex)
