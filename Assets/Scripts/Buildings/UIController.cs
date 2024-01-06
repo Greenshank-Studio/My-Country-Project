@@ -34,13 +34,9 @@ public class UIController : MonoBehaviour
 
         PlaceHouseButton.onClick.AddListener(() =>
         {
-            // ResetButtonColor();
-            // ModifyOutline(PlaceHouseButton);
-            // print(OnHousePlacement == null);
-            // print("google");
+            ResetButtonColor();
+            ModifyOutline(PlaceHouseButton);
             OnHousePlacement?.Invoke(0);
-            // print(OnHousePlacement == null);
-            // print("yandex");
         });
 
 
@@ -53,6 +49,14 @@ public class UIController : MonoBehaviour
         });
     }
 
+    public void ChosenHouse()
+    {
+        _chooseBuildingMenu.SetActive(false);
+        OnMenuStateChanged?.Invoke(false);
+        ResetButtonColor();
+        ModifyOutline(PlaceHouseButton);
+        OnHousePlacement?.Invoke(0);
+    }
 
     public void OpenShop()
     {

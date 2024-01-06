@@ -30,13 +30,11 @@ public class GameManager : MonoBehaviour
     // при нажатии на кнопку House вызывается эта функция, куда передается индекс здания
     private void HousePlacementHandler(int houseIndex)
     {
-
-        // print(houseIndex);
-        // ClearInputActions();
-        // _structureManager.SetBuildingIndex(houseIndex);
-        // _structureManager.InstantiateFlyingBuilding();
-        // _inputManager.OnMouseHover += _structureManager.SetFlyingStructure;
-        // _inputManager.OnMouseDown += _structureManager.PlaceHouse;
+        ClearInputActions();
+        _structureManager.SetBuildingIndex(houseIndex);
+        _structureManager.InstantiateFlyingBuilding();
+        _inputManager.OnMouseHover += _structureManager.SetFlyingStructure;
+        _inputManager.OnMouseDown += _structureManager.PlaceHouse;
     }
 
     private void RoadPlacementHandler(int roadIndex)
