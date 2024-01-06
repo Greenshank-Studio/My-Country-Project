@@ -18,6 +18,15 @@ public class CameraMovement : MonoBehaviour
 
     private bool _isMenuOpened;
 
+    [UnityEditor.Callbacks.DidReloadScripts]
+    private static void OnScriptsReloaded()
+    {
+    Debug.Log("Applying high CPU load workaround");
+    UnityEditor.EditorApplication.update += () => {
+        System.Threading.Thread.Sleep(8);
+    };
+    }
+
    private void OnEnable() 
     {
        UIController.OnMenuStateChanged += ChangeCameraMovementState;
@@ -36,6 +45,8 @@ public class CameraMovement : MonoBehaviour
         _movementSpeed = _normalSpeed;
         _movementTime = 3f;
         _zoomAmount = 0.5f;
+
+        Application.targetFrameRate = 60; // set frame rate to 30 fps
 
         _rigTransform = GetComponent<Transform>();
         _cameraComponent = _rigTransform.GetChild(0).GetComponent<Camera>();
