@@ -60,6 +60,12 @@ public class UIController : MonoBehaviour
         OnMenuStateChanged?.Invoke(true); // here we run all methods we've been subscribed
     }
 
+    public void CloseShop()
+    {
+        _chooseBuildingMenu.SetActive(false);
+        OnMenuStateChanged?.Invoke(false);
+    }
+
 
     private void ModifyOutline(Button button)
     {
