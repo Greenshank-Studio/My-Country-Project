@@ -4,6 +4,8 @@ using UnityEngine;
 public class BuildingPlacement : StructureManager
 {
     [SerializeField] private StructureReferences[] _structurePrefabs;
+    // [SerializeField] private BuildingPlacement _structureManager;
+    [SerializeField] private InputManager _inputManager;
 
     private void Awake()
     {
@@ -27,6 +29,13 @@ public class BuildingPlacement : StructureManager
         if (CheckPositionBeforePlacement(position))
         {
             placementManager.PlaceObjectOnTheMap(position, _structurePrefabs[_buildingIndex].Size, _structurePrefabs[_buildingIndex].Prefab, CellType.Structure);
+            this.DestroyFlyingBuilding();
+            _inputManager.OnMouseDown = null;
+            _inputManager.OnMouseHold = null;
+            _inputManager.OnMouseUp = null;
+            _inputManager.OnMouseHover = null;
+            // DestroyFlyingBuilding();
+            // IsStructureFlying(false);
             //AudioPlayer.instance.PlayPlacementSound();
         }
     }

@@ -59,6 +59,8 @@ public abstract class StructureManager : MonoBehaviour
         {
             Destroy(_flyingBuilding.gameObject);
             IsStructureFlying(false);
+            // InputManager.OnMouseHover -= BuildingPlacement.SetFlyingStructure;
+            // InputManager.OnMouseDown -= BuildingPlacement.PlaceHouse;
         }
     }
 

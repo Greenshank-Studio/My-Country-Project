@@ -25,37 +25,37 @@ public class UIController : MonoBehaviour
     {
         PlaceRoadButton.onClick.AddListener(() =>
         {
-            ResetButtonColor();
+            // ResetButtonColor();
             ModifyOutline(PlaceRoadButton);
             OnRoadPlacement?.Invoke(0);
         });
 
 
 
-        PlaceHouseButton.onClick.AddListener(() =>
-        {
-            ResetButtonColor();
-            ModifyOutline(PlaceHouseButton);
-            OnHousePlacement?.Invoke(0);
-        });
+        // PlaceHouseButton.onClick.AddListener(() =>
+        // {
+        //     // ResetButtonColor();
+        //     ModifyOutline(PlaceHouseButton);
+        //     OnHousePlacement?.Invoke(0);
+        // });
 
 
 
         DeleteButton.onClick.AddListener(() =>
         {
-            ResetButtonColor();
+            // ResetButtonColor();
             ModifyOutline(DeleteButton);
             OnStructureDelete?.Invoke();
         });
     }
 
-    public void ChosenHouse()
+    public void ChosenHouse(int houseIndex)
     {
         _chooseBuildingMenu.SetActive(false);
         OnMenuStateChanged?.Invoke(false);
-        ResetButtonColor();
-        ModifyOutline(PlaceHouseButton);
-        OnHousePlacement?.Invoke(0);
+        // ResetButtonColor();
+        // ModifyOutline(PlaceHouseButton);
+        OnHousePlacement?.Invoke(houseIndex);
     }
 
     public void OpenShop()
@@ -79,11 +79,11 @@ public class UIController : MonoBehaviour
         outline.enabled = true;
     }
 
-    private void ResetButtonColor()
-    {
-        foreach (Button button in buttonList)
-        {
-            button.GetComponent<Outline>().enabled = false;
-        }
-    }
+    // private void ResetButtonColor()
+    // {
+    //     foreach (Button button in buttonList)
+    //     {
+    //         button.GetComponent<Outline>().enabled = false;
+    //     }
+    // }
 }
