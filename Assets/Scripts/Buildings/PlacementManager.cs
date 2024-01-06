@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class PlacementManager : MonoBehaviour
 {
-    public int width, height; // map size (go to PlacementManager to change Height and Width)
+    public int width, height;
     Grid placementGrid;
 
     private Dictionary<Vector3Int, StructureModel> temporaryRoadobjects = new Dictionary<Vector3Int, StructureModel>();

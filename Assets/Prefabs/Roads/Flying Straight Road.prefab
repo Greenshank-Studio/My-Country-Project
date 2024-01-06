@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6687438759968725441}
-  - component: {fileID: 3268070542771614130}
   m_Layer: 0
   m_Name: Flying Straight Road
   m_TagString: Untagged
@@ -33,25 +32,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3268070542771614130
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1535352840135712835}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4152df7e9a91f442a3accff877acda7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Size: {x: 1, y: 1}
-  MainRenderer:
-  - {fileID: 132959293085405418}
-  _straightRoad: {fileID: 3268070542771614130, guid: 6c48dc06c34013f4fb065e38a331edbf,
-    type: 3}
-  _turnRoad: {fileID: 6774330260988960863, guid: 386a24362deeaab46807d228134f390e,
-    type: 3}
 --- !u!1 &5964241307927862868
 GameObject:
   m_ObjectHideFlags: 0

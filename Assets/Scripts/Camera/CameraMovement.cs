@@ -16,57 +16,37 @@ public class CameraMovement : MonoBehaviour
 
     private Vector3 _newPosition;
 
-<<<<<<< Updated upstream
-    private bool _is_camera_moving;
+    private bool _isMenuOpened;
 
-=======
-    // the following part of the code decreases CPU utilization in Unity editor
->>>>>>> Stashed changes
-    [UnityEditor.Callbacks.DidReloadScripts]
-    private static void OnScriptsReloaded()
+   private void OnEnable() 
     {
-    Debug.Log("Applying high CPU load workaround");
-    UnityEditor.EditorApplication.update += () => {
-        System.Threading.Thread.Sleep(10);
-    };
+       UIController.OnMenuStateChanged += ChangeCameraMovementState;
     }
 
+    private void OnDisable() 
+    {
+        UIController.OnMenuStateChanged -= ChangeCameraMovementState;
+    }
+
+    
     private void Awake()
     {
-        _normalSpeed = 10.1f;
-        _fastSpeed = 20.9f;
+        _normalSpeed = 0.1f;
+        _fastSpeed = 0.3f;
         _movementSpeed = _normalSpeed;
         _movementTime = 3f;
-        _zoomAmount = 0.5f; // zoom speed
-        _is_camera_moving = true;
+        _zoomAmount = 0.5f;
 
         _rigTransform = GetComponent<Transform>();
-        _cameraComponent = Camera.main; // _rigTransform.GetChild(0).GetComponent<Camera>();
-
-        Debug.Log(Camera.main == null);
+        _cameraComponent = _rigTransform.GetChild(0).GetComponent<Camera>();
 
         _newPosition = _rigTransform.position;
     }
 
-    private void Start(){
-        Application.targetFrameRate = 60; // set frame rate to 30 fps
-    }
-
-    private void OnEnable(){ // whan current object is enabled (set active == true)
-        Menu.onMenuOpen += StopCameraMovement;
-    }
-
-    private void OnDisable(){
-        Menu.onMenuOpen -= StopCameraMovement;
-    }
-
-    private void StopCameraMovement(bool is_camera_moving){
-        _is_camera_moving = is_camera_moving;
-    }
-
-    private void LateUpdate() // build-in method
+    private void LateUpdate()
     {
-        if (_is_camera_moving){
+        if(!_isMenuOpened)
+        {
             HandleAllKeyboardInput();
             HandleAllMouseInput();
         }
@@ -78,7 +58,7 @@ public class CameraMovement : MonoBehaviour
         HandleMovementInput();
     }
 
-    private void HandleMovementInput() 
+    private void HandleMovementInput()
     {
         if(Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
         {
@@ -97,19 +77,6 @@ public class CameraMovement : MonoBehaviour
             _newPosition += _rigTransform.right * -_movementSpeed;
         }
 
-<<<<<<< Updated upstream
-=======
-        // constrains of map movement
->>>>>>> Stashed changes
-        if (_newPosition.x > 55) _newPosition.x = 55;
-        if (_newPosition.x < -5) _newPosition.x = -5;
-        if (_newPosition.z > 55) _newPosition.z = 55;
-        if (_newPosition.z < -5) _newPosition.z = -5;
-<<<<<<< Updated upstream
-=======
-
-
->>>>>>> Stashed changes
         _rigTransform.position = Vector3.Lerp(_rigTransform.position, _newPosition, Time.deltaTime * _movementTime);
     }
 
@@ -142,7 +109,6 @@ public class CameraMovement : MonoBehaviour
             {
                 _dragStartPosition = ray.GetPoint(enter);
             }
-            
         }
         if (Input.GetMouseButton(0))
         {
@@ -156,18 +122,25 @@ public class CameraMovement : MonoBehaviour
                 _newPosition = _rigTransform.position + _dragStartPosition - _dragCurrentPosition;
             }
         }
-        
     }
 
     private void HandleMouseZoomInput()
     {
-        if (Input.mouseScrollDelta.y > 0 && _cameraComponent.orthographicSize > 3)
+        if (Input.mouseScrollDelta.y > 0 && _cameraComponent.orthographicSize > 1.5)
         {
             _cameraComponent.orthographicSize -= Input.mouseScrollDelta.y * _zoomAmount;
         }
-        if (Input.mouseScrollDelta.y < 0 && _cameraComponent.orthographicSize < 9)
+        if (Input.mouseScrollDelta.y < 0 && _cameraComponent.orthographicSize < 15)
         {
             _cameraComponent.orthographicSize -= Input.mouseScrollDelta.y * _zoomAmount;
         }
     }
+
+    private void ChangeCameraMovementState(bool isMenuOpened)
+    {
+        _isMenuOpened = isMenuOpened;
+    }
+
+
 }
+

@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6100703596532007955}
   - component: {fileID: 3184318620017045885}
   - component: {fileID: 3602755113219604510}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Grass Cube 3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -32,7 +32,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &6100703596532007955
 MeshFilter:
