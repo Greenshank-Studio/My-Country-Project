@@ -61,6 +61,7 @@ public class UIController : MonoBehaviour
     public void OpenShop()
     {
         _chooseBuildingMenu.SetActive(true);
+        _chooseBuildingMenu.transform.GetChild(1).GetComponent<Scrollbar>().value = 1;
         OnMenuStateChanged?.Invoke(true); // here we run all methods we've been subscribed
     }
 
