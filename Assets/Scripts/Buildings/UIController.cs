@@ -54,7 +54,7 @@ public class UIController : MonoBehaviour
         _chooseBuildingMenu.SetActive(false);
         OnMenuStateChanged?.Invoke(false);
         // ResetButtonColor();
-        ModifyOutline(PlaceHouseButton);
+        // ModifyOutline(PlaceHouseButton);
         OnHousePlacement?.Invoke(0);
     }
 
