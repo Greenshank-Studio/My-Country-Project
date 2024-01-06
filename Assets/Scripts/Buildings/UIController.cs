@@ -25,7 +25,7 @@ public class UIController : MonoBehaviour
     {
         PlaceRoadButton.onClick.AddListener(() =>
         {
-            ResetButtonColor();
+            // ResetButtonColor();
             ModifyOutline(PlaceRoadButton);
             OnRoadPlacement?.Invoke(0);
         });
@@ -34,7 +34,7 @@ public class UIController : MonoBehaviour
 
         PlaceHouseButton.onClick.AddListener(() =>
         {
-            ResetButtonColor();
+            // ResetButtonColor();
             ModifyOutline(PlaceHouseButton);
             OnHousePlacement?.Invoke(0);
         });
@@ -43,7 +43,7 @@ public class UIController : MonoBehaviour
 
         DeleteButton.onClick.AddListener(() =>
         {
-            ResetButtonColor();
+            // ResetButtonColor();
             ModifyOutline(DeleteButton);
             OnStructureDelete?.Invoke();
         });
@@ -53,7 +53,7 @@ public class UIController : MonoBehaviour
     {
         _chooseBuildingMenu.SetActive(false);
         OnMenuStateChanged?.Invoke(false);
-        ResetButtonColor();
+        // ResetButtonColor();
         ModifyOutline(PlaceHouseButton);
         OnHousePlacement?.Invoke(0);
     }
@@ -78,11 +78,11 @@ public class UIController : MonoBehaviour
         outline.enabled = true;
     }
 
-    private void ResetButtonColor()
-    {
-        foreach (Button button in buttonList)
-        {
-            button.GetComponent<Outline>().enabled = false;
-        }
-    }
+    // private void ResetButtonColor()
+    // {
+    //     foreach (Button button in buttonList)
+    //     {
+    //         button.GetComponent<Outline>().enabled = false;
+    //     }
+    // }
 }
