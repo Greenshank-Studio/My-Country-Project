@@ -13,7 +13,6 @@ public class GameManager : MonoBehaviour
 
     private void OnEnable() // this method activates when object is enabled
     {
-        print("DANYA IS THE BEST");
         _uiController.OnRoadPlacement += RoadPlacementHandler; // subscribe to the method
         _uiController.OnHousePlacement += HousePlacementHandler;
         _uiController.OnStructureDelete += DeleteStructureHandler;
@@ -21,7 +20,6 @@ public class GameManager : MonoBehaviour
 
     private void OnDisable() // this method activates when object is disabled
     {
-        print("ANDREY IS THE BEST");
         _uiController.OnRoadPlacement -= RoadPlacementHandler;
         _uiController.OnHousePlacement -= HousePlacementHandler;
         _uiController.OnStructureDelete -= DeleteStructureHandler;

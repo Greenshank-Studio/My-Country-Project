@@ -15,9 +15,22 @@ public class UIController : MonoBehaviour
     List<Button> buttonList;
 
     [SerializeField] private GameObject _chooseBuildingMenu;
+    [SerializeField] private GameObject _shopMenuChanger;
+    [SerializeField] private GameObject _shopMenuText;
+
+    private RectTransform _shopTransform;
+    private Vector3 _initialShopPosition, _newShopPosition;
+
+    private float _movementTime;
+    private bool _isShopOpened;
 
     private void Awake()
     {
+        _movementTime = 10f;
+        _shopTransform = _shopMenuChanger.GetComponent<RectTransform>();
+        _newShopPosition = _shopTransform.localPosition;
+        _initialShopPosition = _shopTransform.localPosition;
+
         buttonList = new List<Button> { PlaceHouseButton, PlaceRoadButton, DeleteButton };
     }
 
@@ -49,6 +62,20 @@ public class UIController : MonoBehaviour
         });
     }
 
+
+    private void LateUpdate()
+    {
+        if(_isShopOpened)
+        {
+            ChangeShopMenuPosition();
+        }
+    }
+
+    private void ChangeShopMenuPosition()
+    {
+        _shopTransform.localPosition = Vector3.Lerp(_shopTransform.localPosition, _newShopPosition, Time.deltaTime * _movementTime); // Vector3 should be updated as a whole thing, not just by position.x only, it won't work
+    }
+
     public void ChosenHouse(int houseIndex)
     {
         _chooseBuildingMenu.SetActive(false);
@@ -61,14 +88,26 @@ public class UIController : MonoBehaviour
     public void OpenShop()
     {
         _chooseBuildingMenu.SetActive(true);
-        _chooseBuildingMenu.transform.GetChild(1).GetComponent<Scrollbar>().value = 1;
+        _isShopOpened = true;
+        // _chooseBuildingMenu.transform.GetChild(1).GetComponent<Scrollbar>().value = 1;
         OnMenuStateChanged?.Invoke(true); // here we run all methods we've been subscribed
     }
 
     public void CloseShop()
     {
         _chooseBuildingMenu.SetActive(false);
+        _isShopOpened = false;
         OnMenuStateChanged?.Invoke(false);
+    }
+
+    public void ChangeHorizontalSlidingMenu(int menuIndex)
+    {
+        _newShopPosition.x =_initialShopPosition.x + menuIndex * -1500;
+    }
+
+    public void ChangeText(string text)
+    {
+        _shopMenuText.GetComponent<TMPro.TextMeshProUGUI>().text = text;
     }
 
 
