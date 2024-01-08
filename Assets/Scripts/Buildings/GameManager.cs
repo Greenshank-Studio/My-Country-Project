@@ -5,7 +5,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private RoadPlacement _roadManager; // add word "System" to all hidden system objects
     [SerializeField] private InputManager _inputManager;
     [SerializeField] private UIController _uiController;
-    [SerializeField] private BuildingPlacement _structureManager;
+    [SerializeField] private BuildingPlacement _buildingPlacement;
     [SerializeField] private StructureDeleting _structureDeleting;
     [SerializeField] private CameraMovement _cameraMovement;
     
@@ -29,10 +29,10 @@ public class GameManager : MonoBehaviour
     private void HousePlacementHandler(int houseIndex)
     {
         ClearInputActions();
-        _structureManager.SetBuildingIndex(houseIndex);
-        _structureManager.InstantiateFlyingBuilding();
-        _inputManager.OnMouseHover += _structureManager.SetFlyingStructure;
-        _inputManager.OnMouseDown += _structureManager.PlaceHouse;
+        _buildingPlacement.SetBuildingIndex(houseIndex);
+        _buildingPlacement.InstantiateFlyingBuilding();
+        _inputManager.OnMouseHover += _buildingPlacement.SetFlyingStructure;
+        _inputManager.OnMouseDown += _buildingPlacement.PlaceHouse;
     }
 
     private void RoadPlacementHandler(int roadIndex)
@@ -56,7 +56,7 @@ public class GameManager : MonoBehaviour
 
     private void ClearInputActions()
     {
-        _structureManager.DestroyFlyingBuilding();
+        _buildingPlacement.DestroyFlyingBuilding();
         _roadManager.DestroyFlyingBuilding();
 
         _inputManager.OnMouseDown = null;

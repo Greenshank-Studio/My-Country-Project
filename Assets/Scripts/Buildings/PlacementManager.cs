@@ -70,7 +70,7 @@ public class PlacementManager : MonoBehaviour
         {
             for(int j = 0; j < size.y; j++)
             {
-                if(placementGrid[position.x + j, position.z + i] != type)
+                if(placementGrid[position.x + i, position.z + j] != type)
                 {
                     return false;
                 }

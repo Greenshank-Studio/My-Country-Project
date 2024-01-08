@@ -49,6 +49,7 @@ public abstract class StructureManager : MonoBehaviour
         }
 
         // _flyingBuilding = Instantiate(_structurePrefabs[_buildingIndex].Prefab);
+        print("hello");
         _flyingBuildingRenderer = _flyingBuilding.transform.GetChild(0).GetComponent<MeshRenderer>();
         IsStructureFlying(true);
     }
